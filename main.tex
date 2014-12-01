@@ -101,7 +101,7 @@
 
 \lstset{
   language=Java,
-  basicstyle=\footnotesize\ttfamily,
+  basicstyle=\scriptsize\ttfamily,
   keywordstyle=\color{javapurple}\bfseries,
   stringstyle=\color{javared},
   commentstyle=\color{javagreen},
@@ -229,16 +229,15 @@
     \end{itemize}
 \end{explainframe}
 
-\begin{frame}{Truffle: How it works}
+\begin{frame}[fragile]{Truffle: How it works}
 	\begin{itemize}
     	\item Truffle: AST Interpreter Framework
         \item Framework to easily implement specialized nodes
         \item Supports AST node rewriting
     \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{Running Example}
+       
+       \vfill
+       \pause 
         \begin{block}{Sample Code}
     	\begin{lstlisting}
         function add(a, b) {
@@ -293,28 +292,29 @@
 % Boxing Elimination, Tree Cloning
 
 \begin{frame}[fragile]{Code example (unoptimized)}
-\begin{lstlisting}[basicstyle=\scriptsize]
+\begin{lstlisting}
 public Object add(...) {
-    Object left = leftNode.executeGeneric(...);
-    Object right = rightNode.executeGeneric(...);
+  Object left = leftNode.executeGeneric(...);
+  Object right = rightNode.executeGeneric(...);
 
-    if (left instanceof Long && right instanceof Long) {
-        try {
-            return ExactMath.addExact((Long) left, (Long) right);
-        }
-        catch (ArithmeticException ex) { }
-    }
+  if (left instanceof Long && right instanceof Long) {
+    try {
+      return ExactMath.addExact((Long) left, (Long) right);
+    } catch (ArithmeticException ex) { }
+  }
 
-    if (left instanceof Long) left = ((Long) left).doubleValue();
-    if (right instanceof Long) right = ((Long) right).doubleValue();
-   	
-    if (left instanceof Double && right instanceof Double)
-        return (Double) left + (Double) right;
+  if (left instanceof Long) 
+      left = ((Long) left).doubleValue();
+  if (right instanceof Long) 
+      right = ((Long) right).doubleValue();
+ 	
+  if (left instanceof Double && right instanceof Double)
+    return (Double) left + (Double) right;
 
-    if (left instanceof String || right instanceof String)
-        return left.toString() + right.toString();
+  if (left instanceof String || right instanceof String)
+    return left.toString() + right.toString();
 
-    throw new UnsupportedSpecializationException(...);
+  throw new UnsupportedSpecializationException(...);
 }
 \end{lstlisting}
 \end{frame}
