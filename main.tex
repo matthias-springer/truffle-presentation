@@ -1,11 +1,11 @@
-\documentclass[xcolor=dvipsname,handout]{beamer} %handout, ignorenonframetext
+\documentclass[xcolor=dvipsname]{beamer}
 
 %\usepackage[ngerman]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath} 
-\usepackage{graphicx} 
-\usepackage{subfigure} 
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfigure}
 \usepackage{multimedia}
 \usepackage{wrapfig}
 \usepackage{listings}
@@ -72,19 +72,19 @@
 % BEAMER-Anpassungen
 %%%%%%%%%%%%%%%%%%%%%%%%
 \setbeamercolor{block title}{bg=DarkOrange}
-\setbeamercolor{block body}{bg=Orange!20} 
+\setbeamercolor{block body}{bg=Orange!20}
 %\setbeamercolor{block title alerted}{bg=red}
-\setbeamercolor{block body alerted}{bg=red!20} 
+\setbeamercolor{block body alerted}{bg=red!20}
 %\setbeamercolor{block title example}{bg=green}
-\setbeamercolor{block body example}{bg=DarkChameleon!20} 
-%\usecolortheme[RGB={205,173,0}]{structure} 
+\setbeamercolor{block body example}{bg=DarkChameleon!20}
+%\usecolortheme[RGB={205,173,0}]{structure}
 \usecolortheme[RGB={30,74,135}]{structure}
 
 \usecolortheme{orchid}
 %\usefonttheme{professionalfonts}
 %\useoutertheme[subsection=false]{smoothbars}
 %\useinnertheme{rectangles}
-%\setbeamertemplate{blocks}[shadow=true] 
+%\setbeamertemplate{blocks}[shadow=true]
 
 \setbeamercovered{transparent}
 \setbeamertemplate{navigation symbols}{}%remove navigation symbols
@@ -199,7 +199,7 @@
         \item Prototype your language: build an abstract syntax tree (AST) interpreter \\
         easy to implement, but slow (tree traversal, virtual method calls)
         \item Make it fast: build a VM, compile AST to byte code, JIT compilation \\
-        hard to implement, reinvent the wheel (memory management etc.) 
+        hard to implement, reinvent the wheel (memory management etc.)
     \end{enumerate}
 
     \begin{alertblock}{With Truffle}
@@ -235,9 +235,9 @@
         \item Framework to easily implement specialized nodes
         \item Supports AST node rewriting
     \end{itemize}
-       
+
        \vfill
-       \pause 
+       \pause
         \begin{block}{Sample Code}
     	\begin{lstlisting}
         function add(a, b) {
@@ -254,7 +254,7 @@
         \caption{Node Rewriting Example}
         \label{fig:node_rewriting}
     \end{figure}
-    
+
     \begin{block}{Sample Code}
    	\begin{lstlisting}
         add(1, 2);
@@ -303,11 +303,11 @@ public Object add(...) {
     } catch (ArithmeticException ex) { }
   }
 
-  if (left instanceof Long) 
+  if (left instanceof Long)
       left = ((Long) left).doubleValue();
-  if (right instanceof Long) 
+  if (right instanceof Long)
       right = ((Long) right).doubleValue();
- 	
+
   if (left instanceof Double && right instanceof Double)
     return (Double) left + (Double) right;
 
@@ -326,17 +326,17 @@ public abstract class SLAddNode extends SLBinaryNode {
   protected final long add(long left, long right) {
     return ExactMath.addExact(left, right);
   }
-    
-  @Specialization 
+
+  @Specialization
   protected final double add(double left, double right) {
     return left + right;
   }
-    
+
   @Specialization(guards = "isString")
   protected final String add(Object left, Object right) {
     return left.toString() + right.toString();
   }
-    
+
   protected final boolean isString(Object a, Object b) {
     return a instanceof String || b instanceof String;
   }
@@ -352,7 +352,7 @@ public abstract class SLAddNode extends SLBinaryNode {
         \caption{Generated code for code example}
         \label{fig:gencodes}
     \end{figure}
-    
+
 \end{frame}
 
 \begin{explainframe}{Code Example}
@@ -417,7 +417,7 @@ function add(a, b) {
     \centering
     \includegraphics[width=0.8\textwidth]{nodes.pdf}
     \caption{Generated code for code example}
-  \end{figure}   
+  \end{figure}
 \end{frame}
 
 \subsection{Assumptions}
@@ -448,7 +448,7 @@ function add(a, b) {
 final class MyCallNode {
   private final MyFunction function;
   private final Assumption functionStable;
-  
+
   protected SLDirectDispatchNode(...MyFunction function) {
     this.function = function;
     this.functionStable = function.getStableAssumption();
@@ -554,7 +554,7 @@ return x4;
       \item (Extremly) slower execution, not practical to run production systems or to debug bigger or longer running systems
     \end{itemize}
   \end{alertblock}
-  
+
   \idea{Build nearly zero overhead debugging with node rewriting and gobal assumptions}
 \end{frame}
 
