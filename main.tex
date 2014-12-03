@@ -140,7 +140,7 @@
 		\begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
 			\usebeamerfont{title in head/foot}\insertshorttitle
 		\end{beamercolorbox}%
-		\begin{beamercolorbox}[wd=.45\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+		\begin{beamercolorbox}[wd=.35\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
 			\usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
 			\insertframenumber{}\ifthenelse{\boolean{isexplainframe}}{E}{} / \inserttotalframenumber\hspace*{2ex}
 	\end{beamercolorbox}}%
@@ -653,6 +653,7 @@ end
   \begin{itemize}
     \item Truffle is an AST interpreter framework
     \item Truffle makes AST interpreters fast
+    \item Truffle (like RPython) let developer concentrate on their domain, not implementing again a generic optimization technique
     \item Truffle provides facilities to specialize AST nodes and makes interpreters even faster
   \end{itemize}
 \end{frame}
