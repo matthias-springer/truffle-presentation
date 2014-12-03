@@ -417,7 +417,7 @@ function add(a, b) {
     \centering
     \includegraphics[width=0.8\textwidth]{nodes.pdf}
     \caption{Generated classes for code example}
-  \end{figure}   
+  \end{figure}
 \end{frame}
 
 \begin{explainframe}{Polymorphic Inline Caching}
@@ -542,12 +542,12 @@ return x4;
   \begin{block}{JavaScript}
     \begin{itemize}
       \item Specialization of JavaScript generic types
-      \item Object prototype chain chaning by "shape" (assumptions)
+      \item Object prototype chain changing by "shape" (assumptions)
     \end{itemize}
   \end{block}
   \begin{block}{Ruby}
     \begin{itemize}
-      \item Mostly method invokation $\rightarrow$ inlining and shaping
+      \item Mostly method invocation $\rightarrow$ in-lining and shaping
       \item Method redefinitions via assumptions
     \end{itemize}
   \end{block}
@@ -555,41 +555,62 @@ return x4;
 
 \begin{frame}{Debugging}
   \begin{alertblock}{Problem}
-  Normal VM Debugging:
+  Normal debugging:
     \begin{itemize}
-      \item Debugging is implemented differently: other or no optimizations, different runtime behavior - bug may only reproducable in production mode
-      \item (Extremly) slower execution, not practical to run production systems or to debug bigger or longer running systems
+      \item Different behavior when debugging: Disabled or different optimizations, different runtime behavior
+      \item (Extremely) slower execution -- may not practical to run production applications
     \end{itemize}
   \end{alertblock}
 
-  \idea{Build nearly zero overhead debugging with node rewriting and gobal assumptions}
+  \idea{Use node rewriting and assumption for nearly zero overhead debugging}
 \end{frame}
 
 
-\begin{frame}{Debugging (2)}
+\begin{frame}[fragile]{Debugging}
+  \begin{columns}[T]
+    \column{.4\textwidth}
+      \begin{block}{Idea}
+        Handle break points as simple AST nodes \\ Optimize using assumptions
+      \end{block}
 
-Idea: Wrapper nodes (e.g. as potendial break point)
+      \begin{lstlisting}
+while x < y
+  x += 1
+  y -= 1
+end
+      \end{lstlisting}
 
-\begin{enumerate}
- \item Inactive points: define assumptions that they are not activated; truffle optimizes code as the breakpoint would not exists
- \item Active point: assumption is invalidated, nodes are deopimizated
- \item On execution: condition is executed, execution may halt; multiple executions triggers again optimization
-\end{enumerate}
+    \column{.55\textwidth}
+      \begin{figure}
+        \centering
+        \includegraphics[width=0.7\textwidth]{breakpoints-crop.pdf}
+        \label{fig:breakpoints}
+      \end{figure}
+  \end{columns}
 
-\idea{Zero overhead for inactive or never executed break points}
 
-\vspace{.3cm}
+% Idea: Wrapper nodes (e.g. as potendial break point)
 
-Additional: Inline condition \& co for fast debug execution
+% \begin{enumerate}
+%  \item Inactive points: define assumptions that they are not activated; truffle optimizes code as the breakpoint would not exists
+%  \item Active point: assumption is invalidated, nodes are deopimizated
+%  \item On execution: condition is executed, execution may halt; multiple executions triggers again optimization
+% \end{enumerate}
+
+% \idea{Zero overhead for inactive or never executed break points}
+
+% \vspace{.3cm}
+
+% Additional: Inline condition \& co for fast debug execution
 \end{frame}
 
 
 \begin{frame}{Debugging (3): Results}
-\begin{figure}
-  \includegraphics[width=\textwidth]{performance-debugging.pdf}
-  \caption{Relative debugging performance in different Ruby VM implementations}
-  \label{fig:debuggin_performance}
-\end{figure}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{performance-debugging.pdf}
+    \caption{Relative debugging performance in different Ruby VM implementations}
+    \label{fig:debuggin_performance}
+  \end{figure}
 \end{frame}
 
 
@@ -597,12 +618,12 @@ Additional: Inline condition \& co for fast debug execution
 %%%%%%%%%%%%%%%%%
 
 \begin{frame}{Summary}
-Truffle:
-\begin{itemize}
-\item is a framework to write AST interpreters
-\item implements common optimizations - interpreters authors concentrate on implementation domain and language specific specializations und optimizations
-\item results in fast and small interpreter
-\end{itemize}
+  Truffle:
+  \begin{itemize}
+    \item is a framework to write AST interpreters
+    \item implements common optimizations - interpreters authors concentrate on implementation domain and language specific specializations and optimizations
+    \item results in fast and small interpreter
+  \end{itemize}
 \end{frame}
 
 
@@ -610,20 +631,13 @@ Truffle:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{References}
-\begin{itemize}
-  \item C. Seaton, M. L. Van De Vanter, and M. Haupt. Debugging at full speed. In Proceedings of the 8th Workshop on Dynamic Languages and Applications (DYLA), 2014.
-  \item T. Würthinger, C. Wimmer, A. Wöß, L. Stadler, G. Duboscq, C. Humer, G. Richards, D. Simon, M. Wolczko. One VM to Rule Them All, 2013.
-  \item T. Würthinger, A. Woß, L. Stadler, G. Duboscq, D. Simon, C. Wimmer. Self-Optimizing AST Interpreters, 2012.
+  \begin{itemize}
+    \item C. Seaton, M. L. Van De Vanter, and M. Haupt. Debugging at full speed. In Proceedings of the 8th Workshop on Dynamic Languages and Applications (DYLA), 2014.
+    \item T. Würthinger, C. Wimmer, A. Wöß, L. Stadler, G. Duboscq, C. Humer, G. Richards, D. Simon, M. Wolczko. One VM to Rule Them All, 2013.
+    \item T. Würthinger, A. Woß, L. Stadler, G. Duboscq, D. Simon, C. Wimmer. Self-Optimizing AST Interpreters, 2012.
 
-  \item Diagrams taken from \emph{One VM to Rule Them All} and \emph{Self-Optimizing AST Interpreters}
-\end{itemize}
+    \item Diagrams taken from \emph{One VM to Rule Them All} and \emph{Self-Optimizing AST Interpreters}
+  \end{itemize}
 \end{frame}
 
-
-
-
-
-
 \end{document}
-
-
