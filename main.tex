@@ -1,4 +1,4 @@
-\documentclass[xcolor=dvipsname]{beamer}
+\documentclass[xcolor=dvipsname,handout]{beamer}
 
 %\usepackage[ngerman]{babel}
 \usepackage[T1]{fontenc}
@@ -89,6 +89,7 @@
 \setbeamercovered{transparent}
 \setbeamertemplate{navigation symbols}{}%remove navigation symbols
 
+\newcommand{\up}[1]{\ensuremath{^{{\tiny#1}}}}
 
 
 % Eigene Anpassungen
@@ -219,7 +220,7 @@
 
 \section{How It Works}
 
-\begin{frame}{Infrastructure}
+\begin{frame}{Infrastructure \up{[2]}}
 	\begin{figure}
         \includegraphics[width=\textwidth]{infrastructure.pdf}
         \caption{Interaction Graal/Truffle}
@@ -247,7 +248,7 @@
 
        \vfill
        \pause
-        \begin{block}{Sample Code}
+        \begin{block}{Sample Code (running example)}
     	\begin{lstlisting}
   function showSumMilliseconds(a, b) {
   	return (a + b) + " ms";
@@ -285,7 +286,7 @@ public Object add(...) {
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{Node Rewriting}
+    \frametitle{Node Rewriting \up{[2]}}
 	\begin{figure}
     	\includegraphics[width=\textwidth]{node_rewriting.pdf}
         \label{fig:node_rewriting}
@@ -315,7 +316,7 @@ public Object add(...) {
     \end{itemize}
 \end{explainframe}
 
-\begin{frame}[fragile]{Deoptimization}
+\begin{frame}[fragile]{Deoptimization \up{[2]}}
     \begin{figure}
         \includegraphics[width=\textwidth]{deopt.pdf}
         \caption{Deoptimization of Native Code}
@@ -331,7 +332,20 @@ public Object add(...) {
 	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{Code Example \#2 (Using Annotation-Based DSL)}
+\begin{explainframe}{Deoptimization}
+    \begin{itemize}
+        \item Switch from compiled mode to interpreted mode if safety guard fails
+        \item Reconstruction of program state in interpreter
+        \item Node rewriting (see previous slides)
+        \begin{itemize}
+            \item Switch from specialized node to generic node
+            \item In this example: switch from \lstinline{integer} node to \lstinline{double} node directly, because \lstinline{double} nodes can also handle the \lstinline{integer} case
+        \end{itemize}
+        \item Partial evaluation (see previous slides)
+    \end{itemize}
+\end{explainframe}
+
+\begin{frame}[fragile]{Code Example \#2 (using Annotation-Based DSL)}
   \begin{lstlisting}
 public abstract class SLAddNode extends SLBinaryNode {
   @Specialization(rewriteOn=ArithmeticException.class)
@@ -382,7 +396,7 @@ public abstract class SLAddNode extends SLBinaryNode {
 \subsection{Node Rewriting}
 % Self
 
-\begin{frame}[fragile]{AST Inlining}
+\begin{frame}[fragile]{AST Inlining \up{[3]}}
   \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{image02-2.pdf}
@@ -404,7 +418,7 @@ function add(a, b) {
     \end{block}
 \end{frame}
 
-\begin{frame}[fragile]{AST Inlining}
+\begin{frame}[fragile]{AST Inlining \up{[3]}}
   \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{image01-2.pdf}
@@ -413,11 +427,11 @@ function add(a, b) {
   \end{figure}
 \end{frame}
 
-\begin{frame}{Polymorphic Inline Caching}
+\begin{frame}{Type Decision Chains \up{[3]}}
   \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{poly.pdf}
-    \caption{Polymorphic AST Nodes}
+    \caption{Type Decision Chains as Truffle's implementation of Polymorphic Inline Caches}
     \label{fig:poly}
   \end{figure}
 \end{frame}
@@ -429,7 +443,7 @@ function add(a, b) {
   \end{figure}
 \end{frame}
 
-\begin{explainframe}{Polymorphic Inline Caching}
+\begin{explainframe}{Type Decision Chains}
     \begin{itemize}
         \item \textbf{Polymorphic node:} node can handle a limited set of types (linked list via \lstinline{next} field): polymorphic inline caching
         \item Last element in linked list is megamorphic
@@ -511,10 +525,10 @@ final class MyCallNode {
 \begin{frame}[fragile]{Single Static Assignment (SSA) Form}
   \begin{block}{Original Sample Code}
   \begin{lstlisting}
-if(condition) {
+if (condition) {
   x = value1 + value2;
 } else {
-  x = value2
+  x = value2;
 }
 return x * 2;
   \end{lstlisting}
@@ -522,10 +536,10 @@ return x * 2;
   \pause
   \begin{block}{Sample Code in SSA Form}
   \begin{lstlisting}
-if(condition) {
+if (condition) {
   x1 = value1 + value2;
 } else {
-  x2 = value2
+  x2 = value2;
 }
 x3 = phi(x1, x2);
 x4 = x3 * 2;
@@ -536,11 +550,11 @@ return x4;
 
 \begin{explainframe}{Single Static Assignment (SSA) Form}
   \begin{itemize}
-    \item Every variable only written once
-    \item \texttt{phi}s capture variables from different branches
-    \item Replace read access with address from last write
-    \item Implicit all constant
-    \item Optimize flow control
+    \item Every variable is only written once.
+    \item \texttt{phi} nodes capture variables from different branches.
+    \item Replaces read access with address from last write.
+    \item All variables are implicitly final/constant.
+    \item Makes it easier to do certain optimizations (e.g. dead code elimination, common subexpression elimination, \ldots).
   \end{itemize}
 \end{explainframe}
 
@@ -575,7 +589,7 @@ return x4;
 \end{frame}
 
 
-\begin{frame}[fragile]{Debugging (2/3)}
+\begin{frame}[fragile]{Debugging (2/3) \up{[1]}}
   \begin{columns}[T]
     \column{.4\textwidth}
       \begin{block}{Idea}
@@ -614,7 +628,7 @@ end
 \end{frame}
 
 
-\begin{frame}{Debugging (3/3): Results}
+\begin{frame}{Debugging (3/3): Results \up{[1]}}
   \begin{figure}
     \includegraphics[width=\textwidth]{performance-debugging.pdf}
     \caption{Relative debugging performance in different Ruby VM implementations}
@@ -650,12 +664,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{References}
-  \begin{itemize}
-    \item C. Seaton, M. L. Van De Vanter, and M. Haupt. Debugging at full speed. In Proceedings of the 8th Workshop on Dynamic Languages and Applications (DYLA), 2014.
-    \item T. Würthinger, C. Wimmer, A. Wöß, L. Stadler, G. Duboscq, C. Humer, G. Richards, D. Simon, M. Wolczko. One VM to Rule Them All, 2013.
-    \item T. Würthinger, A. Woß, L. Stadler, G. Duboscq, D. Simon, C. Wimmer. Self-Optimizing AST Interpreters, 2012.
-    \item \textit{Diagrams are taken from the papers above.}
-  \end{itemize}
+  \begin{description}
+    \item[1]{C. Seaton, M. L. Van De Vanter, and M. Haupt. Debugging at full speed. In Proceedings of the 8th Workshop on Dynamic Languages and Applications (DYLA), 2014.}
+    \item[2] T. Würthinger, C. Wimmer, A. Wöß, L. Stadler, G. Duboscq, C. Humer, G. Richards, D. Simon, M. Wolczko. One VM to Rule Them All, 2013.
+    \item[3] T. Würthinger, A. Woß, L. Stadler, G. Duboscq, D. Simon, C. Wimmer. Self-Optimizing AST Interpreters, 2012.
+  \end{description}
 \end{frame}
 
 \end{document}
