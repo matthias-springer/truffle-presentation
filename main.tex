@@ -192,24 +192,32 @@
 	\tableofcontents[hideallsubsections]
 \end{frame}
 
-\section{How to implement a programming language?}
+\section{How to Implement a Programming Language?}
 
-\begin{frame}{How to implement a programming language?}
+\begin{frame}{How to Implement a Programming Language?}
     \begin{enumerate}
-        \item Prototype your language: build an abstract syntax tree (AST) interpreter \\
-        easy to implement, but slow (tree traversal, virtual method calls)
-        \item Make it fast: build a VM, compile AST to byte code, JIT compilation \\
-        hard to implement, reinvent the wheel (memory management etc.)
+        \item Prototype: build an abstract syntax tree (AST) interpreter
+        \begin{itemize}
+          \item Easy to implement
+          \item But slow (tree traversal, virtual method calls)
+        \end{itemize}
+        \item Make it fast
+        \begin{itemize}
+          \item Build a VM
+          \item Compile AST to byte code
+          \item JIT compilation
+        \end{itemize}
+        $\rightarrow$ Hard to implement, reinvent the wheel (memory management etc.)
     \end{enumerate}
 
     \vfill
-    \begin{alertblock}{With Truffle}
-        Truffle: ``how it should be''. Build a parser, define an AST, and add language specific optimizations make it fast.
+    \begin{alertblock}{Truffle -- ``How it should be'':}
+        Build a parser, define an AST and add language specific optimizations to make it fast.
     \end{alertblock}
 \end{frame}
 
 
-\section{How it works}
+\section{How It Works}
 
 \begin{frame}{Infrastructure}
 	\begin{figure}
@@ -230,69 +238,25 @@
     \end{itemize}
 \end{explainframe}
 
-\begin{frame}[fragile]{Truffle: How it works}
+\begin{frame}[fragile]{Truffle: How It Works}
 	\begin{itemize}
-    	\item Truffle: AST Interpreter Framework
+    	\item Truffle: AST interpreter framework
         \item Framework to easily implement specialized nodes
-        \item Supports AST node rewriting
+        \item Based on AST node rewriting
     \end{itemize}
 
        \vfill
        \pause
         \begin{block}{Sample Code}
     	\begin{lstlisting}
-        function add(a, b) {
-        	return (a + b) + " ms";
-        }
+  function showSumMilliseconds(a, b) {
+  	return (a + b) + " ms";
+  }
       \end{lstlisting}
 	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]
-    \frametitle{Node Rewriting}
-	\begin{figure}
-    	\includegraphics[width=\textwidth]{node_rewriting.pdf}
-        \caption{Node Rewriting Example}
-        \label{fig:node_rewriting}
-    \end{figure}
-
-    \begin{block}{Sample Code}
-   	\begin{lstlisting}
-        add(1, 2);
-    \end{lstlisting}
-    \end{block}
-\end{frame}
-
-\begin{explainframe}{Node Rewriting}
-    \begin{itemize}
-        \item Generic nodes can handle all types.
-        \item Guards check if the type specialization is still accurate.
-        \item Partial evaluation once a tree stablized (no rewrites for a while) and is \emph{hot}.
-        \begin{itemize}
-        	\item Inlines \texttt{execute()} methods generates native code.
-            \item Adds a check and a deoptimization call where a rewrite could happen.
-        	\item Requires Graal (accessing compiler with Java code).
-        \end{itemize}
-        \item Truffle without Graal: interpreter mode
-    \end{itemize}
-\end{explainframe}
-
-\begin{frame}[fragile]{Deoptimization}
-    \begin{figure}
-        \includegraphics[width=\textwidth]{deopt.pdf}
-        \caption{Deoptimization of Native Code}
-        \label{fig:deopt}
-    \end{figure}
-    \begin{block}{Sample Code}
-    	\begin{lstlisting}
-      add(1, 2.5);
-      \end{lstlisting}
-	\end{block}
-\end{frame}
-
-% Boxing Elimination, Tree Cloning
-
-\begin{frame}[fragile]{Code example (unoptimized)}
+\begin{frame}[fragile]{Code Example \#1}
 \begin{lstlisting}
 public Object add(...) {
   Object left = leftNode.executeGeneric(...);
@@ -320,7 +284,54 @@ public Object add(...) {
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Code example using annotation-based DSL}
+\begin{frame}[fragile]
+    \frametitle{Node Rewriting}
+	\begin{figure}
+    	\includegraphics[width=\textwidth]{node_rewriting.pdf}
+        \label{fig:node_rewriting}
+    \end{figure}
+
+    \begin{block}{Sample Code}
+   	\begin{lstlisting}
+  function showSumMilliseconds(a, b) {
+    return (a + b) + " ms";
+  }
+  showSumMilliseconds(1, 2);
+    \end{lstlisting}
+    \end{block}
+\end{frame}
+
+\begin{explainframe}{Node Rewriting}
+    \begin{itemize}
+        \item Generic nodes can handle all types.
+        \item Guards check if the type specialization is still accurate.
+        \item Partial evaluation once a tree stablized (no rewrites for a while) and is \emph{hot}.
+        \begin{itemize}
+        	\item Inlines \texttt{execute()} methods generates native code.
+            \item Adds a check and a deoptimization call where a rewrite could happen.
+        	\item Requires Graal (accessing compiler with Java code).
+        \end{itemize}
+        \item Truffle without Graal: interpreter mode
+    \end{itemize}
+\end{explainframe}
+
+\begin{frame}[fragile]{Deoptimization}
+    \begin{figure}
+        \includegraphics[width=\textwidth]{deopt.pdf}
+        \caption{Deoptimization of Native Code}
+        \label{fig:deopt}
+    \end{figure}
+    \begin{block}{Sample Code}
+    	\begin{lstlisting}
+  function showSumMilliseconds(a, b) {
+    return (a + b) + " ms";
+  }
+  showSumMilliseconds(1, 2.5);
+      \end{lstlisting}
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Code Example \#2 (Using Annotation-Based DSL)}
   \begin{lstlisting}
 public abstract class SLAddNode extends SLBinaryNode {
   @Specialization(rewriteOn=ArithmeticException.class)
@@ -345,12 +356,11 @@ public abstract class SLAddNode extends SLBinaryNode {
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}{Code example using annotation-based DSL}
+\begin{frame}{Classes Generated by DSL Preprocessor}
 
 	    \begin{figure}
         \centering
-        \includegraphics[width=0.8\textwidth]{nodes_less.pdf}
-        \caption{Generated classes for code example}
+        \includegraphics[width=\textwidth]{nodes_less.pdf}
         \label{fig:gencodes}
     \end{figure}
 
@@ -369,20 +379,19 @@ public abstract class SLAddNode extends SLBinaryNode {
 \section{Optimizations}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Node rewriting}
+\subsection{Node Rewriting}
 % Self
 
-\begin{frame}[fragile]{AST inlining}
+\begin{frame}[fragile]{AST Inlining}
   \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{image02-2.pdf}
-    \caption{AST inlining}
     \label{fig:inlining}
   \end{figure}
 \end{frame}
 
-\begin{frame}[fragile]{Slightly more complex example}
-    \begin{block}{JavaScript}
+\begin{frame}[fragile]{Slightly More Complex Example}
+    \begin{block}{Sample Code}
     \begin{lstlisting}
 function foo() {
     return add(1, 2) + add("hello", "world");
@@ -395,11 +404,11 @@ function add(a, b) {
     \end{block}
 \end{frame}
 
-\begin{frame}[fragile]{AST inlining}
+\begin{frame}[fragile]{AST Inlining}
   \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{image01-2.pdf}
-    \caption{AST evolution}
+    \includegraphics[width=0.9\textwidth]{image01-2.pdf}
+    \caption{AST Evolution}
     \label{fig:inlining2}
   \end{figure}
 \end{frame}
@@ -413,11 +422,10 @@ function add(a, b) {
   \end{figure}
 \end{frame}
 
-\begin{frame}{Polymorphic Inline Caching}
+\begin{frame}{Classes Generated by DSL Preprocessor}
   \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{nodes.pdf}
-    \caption{Generated classes for code example}
+    \includegraphics[width=\textwidth]{nodes.pdf}
   \end{figure}
 \end{frame}
 
@@ -451,7 +459,7 @@ function add(a, b) {
         \alert{No runtime overhead in compiled code}
     \end{center}
 \end{frame}
-\begin{frame}[fragile]{Example: Assumption for method redefinition}
+\begin{frame}[fragile]{Code Example \#3: Assumption for Method Redefinition}
   \begin{lstlisting}
 final class MyCallNode {
   private final MyFunction function;
@@ -474,10 +482,10 @@ final class MyCallNode {
   \end{lstlisting}
 \end{frame}
 
-\subsection{Local variables}
-\begin{frame}{Local variables}
+\subsection{Local Variables}
+\begin{frame}{Local Variables}
     \begin{alertblock}{Requirement}
-        Highly efficient local variables access while simple modeling
+        Highly efficient access to local variables while simple modeling
         \begin{itemize}
           \item Modeled as an array on \texttt{Frame} object
           \item Access nodes must be specializable for dynamic profiling
@@ -500,8 +508,8 @@ final class MyCallNode {
     \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Single static assignment (SSA) form}
-  \begin{block}{Source example}
+\begin{frame}[fragile]{Single Static Assignment (SSA) Form}
+  \begin{block}{Original Sample Code}
   \begin{lstlisting}
 if(condition) {
   x = value1 + value2;
@@ -512,7 +520,7 @@ return x * 2;
   \end{lstlisting}
   \end{block}
   \pause
-  \begin{block}{SSA form}
+  \begin{block}{Sample Code in SSA Form}
   \begin{lstlisting}
 if(condition) {
   x1 = value1 + value2;
@@ -526,7 +534,7 @@ return x4;
   \end{block}
 \end{frame}
 
-\begin{explainframe}{Single static assignment (SSA) form}
+\begin{explainframe}{Single Static Assignment (SSA) Form}
   \begin{itemize}
     \item Every variable only written once
     \item \texttt{phi}s capture variables from different branches
@@ -536,7 +544,7 @@ return x4;
   \end{itemize}
 \end{explainframe}
 
-\section{Possiblities (Guest language implementations)}
+\section{Applications}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Languages}
@@ -554,7 +562,7 @@ return x4;
   \end{block}
 \end{frame}
 
-\begin{frame}{Debugging}
+\begin{frame}{Debugging (1/3)}
   \begin{alertblock}{Problem}
   Normal debugging:
     \begin{itemize}
@@ -567,7 +575,7 @@ return x4;
 \end{frame}
 
 
-\begin{frame}[fragile]{Debugging}
+\begin{frame}[fragile]{Debugging (2/3)}
   \begin{columns}[T]
     \column{.4\textwidth}
       \begin{block}{Idea}
@@ -606,7 +614,7 @@ end
 \end{frame}
 
 
-\begin{frame}{Debugging (3): Results}
+\begin{frame}{Debugging (3/3): Results}
   \begin{figure}
     \includegraphics[width=\textwidth]{performance-debugging.pdf}
     \caption{Relative debugging performance in different Ruby VM implementations}
@@ -620,19 +628,19 @@ end
 
 \begin{frame}{Summary}
   \begin{itemize}
-    \item Truffle is an AST interpreter framework.
-    \item Truffle makes AST interpreters fast.
-    \item Truffle provides facilities to specialize AST nodes and makes interpreters even faster.
+    \item Truffle is an AST interpreter framework
+    \item Truffle makes AST interpreters fast
+    \item Truffle provides facilities to specialize AST nodes and makes interpreters even faster
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Future Work}
-    Open, but could be one or more of the following topics.
+    Open, but could be one or more of the following topics:
     \begin{itemize}
         \item Interaction with Graal VM
         \item Partial Evaluation
         \item Deoptimization
-        \item DSL preprocessor
+        \item DSL Preprocessor
         \item Type System
         \item JRuby
     \end{itemize}
@@ -646,8 +654,7 @@ end
     \item C. Seaton, M. L. Van De Vanter, and M. Haupt. Debugging at full speed. In Proceedings of the 8th Workshop on Dynamic Languages and Applications (DYLA), 2014.
     \item T. Würthinger, C. Wimmer, A. Wöß, L. Stadler, G. Duboscq, C. Humer, G. Richards, D. Simon, M. Wolczko. One VM to Rule Them All, 2013.
     \item T. Würthinger, A. Woß, L. Stadler, G. Duboscq, D. Simon, C. Wimmer. Self-Optimizing AST Interpreters, 2012.
-
-    \item Diagrams are taken from the papers above.
+    \item \textit{Diagrams are taken from the papers above.}
   \end{itemize}
 \end{frame}
 
