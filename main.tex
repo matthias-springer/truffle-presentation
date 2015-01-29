@@ -173,6 +173,19 @@
 	\tableofcontents[hideallsubsections]
 \end{frame}
 
+\section{Truffle Demo}
+
+\begin{frame}{Truffle in Usage}
+[Small reminder on truffle / graal]
+example script (5 times; n.times integer stuff)]
+
+performance results
+
+warm up time!!
+
+live backtracing in eclipse on graal optimizations
+\end{frame}
+
 \section{Keyword Arguments}
 
 \begin{frame}[fragile]{Keyword Arguments in Ruby 2.0}
@@ -236,6 +249,22 @@ ArgumentError: unknown keyword: x
 \end{frame}
 
 \section{Optimizations}
+
+
+\begin{frame}{JRuby: Understanding a method}
+\begin{enumerate}
+ \item method node (or how it is called)
+ \item RubyRootNode
+ \item SequenceNode
+ \item CheckArityNode
+ \item WriteFactory for args 1
+ \item WriteFactory for args 2
+ \item WriteFactory for kw e
+ \item WriteFactory for kw c
+\end{enumerate}
+
+\end{frame}
+
 \begin{frame}{Was Malte macht}
 
 \end{frame}
