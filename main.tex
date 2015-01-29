@@ -129,6 +129,24 @@
 	\vskip0pt%
 }
 
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+
+\lstset{
+  language=Ruby,
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\color{javapurple}\bfseries,
+  stringstyle=\color{javared},
+  commentstyle=\color{javagreen},
+  morecomment=[s][\color{javadocblue}]{/**}{*/},
+  tabsize=4,
+  showspaces=false,
+  showstringspaces=false,
+  breaklines=true
+}
+
 
 % Gliederung vor jedem Punkt:
 \AtBeginSection[]{
@@ -298,6 +316,73 @@ method & declarationFrame & self & block & countKwArgs  \\
 \begin{itemize}
     \item Read keyword argument: if \lstinline{countKwArgs > 0}, scan expanded Hash. Else, extract value from Hash.
     \item Read argument: if last argument is expanded Hash: \\ generate Hash object.
+    \item Read rest keyword arguments: generate Hash object for keywords that are not excluded.
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Recap: Type Decision Chains}
+
+\end{frame}
+
+\begin{frame}{Fully Optimized Keyword Arguments}
+\begin{itemize}
+    \item Before: \lstinline{RubyCallNode.arguments} contains keys and values of keyword arguments
+    \item Idea: call node is method-specific and stores values only (no keys!) for arguments specified in signature
+    \item Benefit: no linear scan of keyword argument array section
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Fully Optimized Keyword Arguments (Example)}
+\begin{lstlisting}
+class Cls1
+    def method(a:, **kwargs)
+    end
+end
+
+def Cls2
+    def method(a:, b:)
+    end
+end
+
+def getObject
+    # first call returns "Cls1.new"
+    # second call returns "Cls2.new"
+end
+
+2.times do
+    getObject().method(a: 1, b: 2)
+end
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Fully Optimized Keyword Arguments (Example)}{Type Decision Chain}
+\begin{table}
+    \centering
+    \includegraphics[width=\textwidth]{fully_opt.pdf}
+\end{table}
+
+\begin{itemize}
+    \item Node specialization for every method (for every receiver type)
+    \item Specialized nodes do not construct Hash nodes only to read arguments from them
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Fully Optimized Keyword Arguments (Example)}{Generic Case}
+\begin{table}
+    \centering
+    \includegraphics[width=\textwidth]{kwargs_generic.pdf}
+\end{table}
+\end{frame}
+
+\begin{frame}{Fully Optimized Keyword Arguments}{Problems}
+\begin{itemize}
+    \item Nodes are specific with regard to user-defined Ruby classes \\ (cannot use Truffle DSL)
+    \item Specializations are defined in Java code \\ (need to generate Java classes on the fly)
+    \item Type of receiver is not known before dispatching the call
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Almost Fully Optimized Keyword Arguments}
+Store HashMap mapping receiver type to arguments array in RubyCallNodes. Assumption invalidates arguments when method with that name changes. When threshold is reached, switch to old behavior. Kind of specialization built by ourselves.
 \end{frame}
 \end{document}
