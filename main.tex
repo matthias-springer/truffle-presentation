@@ -240,7 +240,64 @@ ArgumentError: unknown keyword: x
 
 \end{frame}
 
-\begin{frame}{Getting rid of the Hash}
+\begin{frame}{Store Keyword Arguments in Array}
+\begin{itemize}
+    \item Before: \lstinline{RubyCallNode.arguments} contains a Hash as last array element
+    \item Idea: add key-value pairs to array with marker object as hash separator
+    \item Benefit: no Hash creation
+\end{itemize}
 
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+$\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\mathit{value}_1$ & $\mathit{key}_2$ & $\mathit{value}_2$ & \ldots & * \\
+\hline
+\end{tabular}
+\end{table}
+\begin{itemize}
+    \item $\mathit{arg}_i$: $i$th argument (\lstinline{RubyNode})
+    \item *: marker (\lstinline{MarkerNode}, executes to singleton \lstinline{Object})
+    \item $\mathit{key}_i$: $i$th key in Hash (\lstinline{StringLiteralNode})
+    \item $\mathit{value}_i$: $i$th value in Hash (\lstinline{RubyNode})
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Store Keyword Arguments in Array}
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+method & declarationFrame & self & block & countKwArgs  \\ 
+\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+ $\mathit{arg}_0$ & \ldots & $\mathit{arg}_{n-1}$ & *  & $\mathit{key}_1$\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+ $\mathit{value}_1$ & \ldots  & $\mathit{key}_m$ & $\mathit{value}_m$ & * \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+    \item $\mathit{arg}_i$: $i$th argument (\lstinline{Object})
+    \item *: marker (singleton \lstinline{Object})
+    \item $\mathit{key}_i$: $i$th key in Hash (\lstinline{String})
+    \item $\mathit{value}_i$: $i$th value in Hash (\lstinline{Object})
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Store Keyword Arguments in Array}
+\begin{itemize}
+    \item Read keyword argument: if \lstinline{countKwArgs > 0}, scan expanded Hash. Else, extract value from Hash.
+    \item Read argument: if last argument is expanded Hash: \\ generate Hash object.
+\end{itemize}
 \end{frame}
 \end{document}
