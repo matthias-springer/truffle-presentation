@@ -206,7 +206,7 @@ live backtracing in eclipse on graal optimizations
 
 \section{Keyword Arguments}
 
-\begin{frame}[fragile]{Keyword Arguments in Ruby 2.0}
+\begin{frame}[fragile]{Keyword Arguments in Ruby 2.x}
 \begin{lstlisting}
 def method(a, b = 1, c:, d: 2, **more)
     [a, b, c, d]
@@ -222,7 +222,7 @@ method(10, e: 30, c: 40)
 \end{table}
 \end{frame}
 
-\begin{frame}[fragile]{Keyword Arguments in Ruby 2.0}
+\begin{frame}[fragile]{Keyword Arguments in Ruby 2.x}
 \begin{lstlisting}
 def method(a = 1, b: 2)
     [a, b]
@@ -233,14 +233,24 @@ method({b: 3})
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Keyword Arguments in Ruby 2.0}
-\begin{lstlisting}
+\begin{frame}[fragile]{Keyword Arguments in Ruby 2.x}
+\begin{lstlisting}[caption=test]
 def method(a = 1, b: 2)
     [a, b]
 end
 
 method({x: 1})
 ArgumentError: unknown keyword: x
+\end{lstlisting}
+
+\begin{lstlisting}[caption=test]
+def method(a:, b: 2)
+    [a, b]
+end
+
+method(**{b: 3, a: 3}, **{a: 4})
+=> [3, 3]  # ruby 2.1
+=> [4, 3]  # ruby 2.2
 \end{lstlisting}
 \end{frame}
 
@@ -271,21 +281,27 @@ ArgumentError: unknown keyword: x
 
 \begin{frame}{JRuby: Understanding a method}
 \begin{enumerate}
- \item method node (or how it is called)
  \item RubyRootNode
- \item SequenceNode
- \item CheckArityNode
- \item WriteFactory for args 1
- \item WriteFactory for args 2
- \item WriteFactory for kw e
- \item WriteFactory for kw c
+ \item Catch*Nodes (CatchNextNode, CatchRetryAsErrorNode, CatchReturnNode \dots)
+ \item SequenceNode \begin{enumerate}
+    \item CheckArityNode
+    \item WriteFactory for args 1
+    \item WriteFactory for args 2
+    \item WriteFactory for kw e
+    \item WriteFactory for kw c
+    \item statement sequence itself (wrapped in TracingNodes)
+  \end{enumerate}
 \end{enumerate}
 
 \end{frame}
 
-\begin{frame}{Was Malte macht}
-
+\begin{frame}{First Optimizations}
+\begin{itemize}
+ \item Reduce duplicate method calls
+ \item Using iterators to improve RubyHash handling
+\end{itemize}
 \end{frame}
+
 
 \begin{frame}{Store Keyword Arguments in Array}
 \begin{itemize}
