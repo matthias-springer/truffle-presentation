@@ -193,7 +193,27 @@
 
 \section{Truffle Demo}
 
-\begin{frame}{Truffle in Usage}
+\begin{frame}{Graal VM - System Architecture}
+
+\begin{table}
+    \centering
+    \includegraphics[width=0.75\textwidth]{graal_architecture.pdf}
+\end{table}
+
+\end{frame}
+
+
+\begin{explainframe}{Graal VM - Details}
+\begin{enumerate}
+    \item HotSpot VM detects \textit{hot} methods
+    \item HotSpot VM adds these methods to compilation queue
+    \item Compiler threads compile methods with highest priorities
+    \item Machine code is installed into runtime's cache
+\end{enumerate}
+
+\end{explainframe}
+
+\begin{frame}{Truffle in Action}
 [Small reminder on truffle / graal]
 example script (5 times; n.times integer stuff)]
 
