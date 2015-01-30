@@ -414,4 +414,22 @@ end
 \begin{frame}{Almost Fully Optimized Keyword Arguments}
 Store HashMap mapping receiver type to arguments array in RubyCallNodes. Assumption invalidates arguments when method with that name changes. When threshold is reached, switch to old behavior. Kind of specialization built by ourselves.
 \end{frame}
+
+
+\section{Summary}
+%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Truffle and RPython - a Very Subjective Comparison}
+\begin{description}
+ \item[RPython] \begin{itemize}
+  \item lightwight stack
+  \item a little bit easier to get to work - mostly getting the correct libs in the python path
+  \item difficult to debug in depth what is happening at execution
+\end{itemize}
+\item[Truffle] \begin{itemize}
+  \item heavy stack (java, mostly multiple JDK and often maven \dots)
+  \item if you get it working, you have the full power of (debugging) java, even graal itself
+\end{itemize}
+\end{description}
+
 \end{document}
