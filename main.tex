@@ -309,7 +309,9 @@ method(**{b: 3, a: 3}, **{a: 4})
     \item Idea: add key-value pairs to array with marker object as hash separator
     \item Benefit: no Hash creation
 \end{itemize}
+\end{frame}
 
+\begin{frame}{Store Keyword Arguments in Array}{AST: \lstinline{RubyCallNode} arguments}
 \begin{table}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
 \hline
@@ -325,7 +327,7 @@ $\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\math
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Store Keyword Arguments in Array}
+\begin{frame}{Store Keyword Arguments in Array}{Arguments (objects) in Method Execution}
 \begin{table}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
@@ -366,7 +368,9 @@ method & declarationFrame & self & block & countKwArgs  \\
 \end{frame}
 
 \begin{frame}{Recap: Type Decision Chains}
-
+\begin{table}
+    \includegraphics[width=\textwidth]{type_chain.pdf}
+\end{table}
 \end{frame}
 
 \begin{frame}{Fully Optimized Keyword Arguments}
