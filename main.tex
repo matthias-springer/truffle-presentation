@@ -510,8 +510,21 @@ end
 \end{table}
 \end{frame}
 
+\begin{explainframe}{Argument Passing in \lstinline{DispatchNode}}
+\begin{itemize}
+    \item Unmodified arguments array (possible with \lstinline{HashLiteralNode}) is stored in \lstinline{UnresolvedDispatchNode}
+    \item \lstinline{CachedDispatchNode} contains keyword arguments mentioned in signature in array, and other keyword arguments in \lstinline{HashLiteralNode}
+    \item \lstinline{ReadKeywordArgumentNode} checks if method dispatch is optimized (marker present in arguments array) and reads keyword arguments from arguments array, otherwise extracts them from \lstinline{Hash} (same as before)
+\end{itemize}
+\end{explainframe}
+
 \begin{frame}{Evaluation}
 benchmarks and explain why it is faster
+
+\begin{itemize}
+    \item Optimization affects only arguments passed in keyword argument syntax in method calls
+    \item Optimization does not affect keyword arguments passed as an already existing \lstinline{Hash}
+\end{itemize}
 \end{frame}
 
 \section{Summary}
