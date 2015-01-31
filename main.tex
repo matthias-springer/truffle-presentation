@@ -174,7 +174,7 @@
 
 % Dokument-Meta-Daten:
 %%%%%%%%%%%%%%%%%%%%%%%
-\title{Truffle -- an overview}
+\title{Truffle -- Limitations and its Application in JRuby}
 \subtitle{Virtual Machines and Execution Environments, WS2014/15}
 \author{Jan Graichen, Fabio Niephaus, Matthias Springer, Malte Swart}
 \date{\today}
@@ -296,9 +296,7 @@ method(**{b: 3, a: 3}, **{a: 4})
 \end{enumerate}
 \end{frame}
 
-\section{Optimizations}
-
-
+\section{Optimizing Keyword Access in JRuby}
 \begin{frame}{JRuby: Understanding a method}
 \begin{enumerate}
  \item RubyRootNode
@@ -315,12 +313,12 @@ method(**{b: 3, a: 3}, **{a: 4})
 
 \end{frame}
 
-\begin{frame}{First Optimizations}
-\begin{itemize}
- \item Reduce duplicate method calls
- \item Using iterators to improve RubyHash handling
-\end{itemize}
-\end{frame}
+%\begin{frame}{First Optimizations}
+%\begin{itemize}
+% \item Reduce duplicate method calls
+% \item Using iterators to improve RubyHash handling
+%\end{itemize}
+%\end{frame}
 
 
 \begin{frame}{Store Keyword Arguments in Array}
@@ -347,37 +345,37 @@ $\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\math
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Store Keyword Arguments in Array}{Arguments (objects) in Method Execution}
-\begin{table}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-method & declarationFrame & self & block & countKwArgs  \\ 
-\hline
-\end{tabular}
-\end{table}
-\begin{table}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
- $\mathit{arg}_0$ & \ldots & $\mathit{arg}_{n-1}$ & *  & $\mathit{key}_1$\\
-\hline
-\end{tabular}
-\end{table}
+%\begin{frame}{Store Keyword Arguments in Array}{Arguments (objects) in Method Execution}
+%\begin{table}
+%\begin{tabular}{|c|c|c|c|c|}
+%\hline
+%method & declarationFrame & self & block & countKwArgs  \\ 
+%\hline
+%\end{tabular}
+%\end{table}
+%\begin{table}
+%\begin{tabular}{|c|c|c|c|c|}
+%\hline
+% $\mathit{arg}_0$ & \ldots & $\mathit{arg}_{n-1}$ & *  & $\mathit{key}_1$\\
+%\hline
+%\end{tabular}
+%\end{table}
 
-\begin{table}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
- $\mathit{value}_1$ & \ldots  & $\mathit{key}_m$ & $\mathit{value}_m$ & * \\
-\hline
-\end{tabular}
-\end{table}
-
-\begin{itemize}
-    \item $\mathit{arg}_i$: $i$th argument (\lstinline{Object})
-    \item *: marker (singleton \lstinline{Object})
-    \item $\mathit{key}_i$: $i$th key in Hash (\lstinline{String})
-    \item $\mathit{value}_i$: $i$th value in Hash (\lstinline{Object})
-\end{itemize}
-\end{frame}
+%\begin{table}
+%\begin{tabular}{|c|c|c|c|c|}
+%\hline
+% $\mathit{value}_1$ & \ldots  & $\mathit{key}_m$ & $\mathit{value}_m$ & * \\
+%\hline
+%\end{tabular}
+%\end{table}
+%
+%\begin{itemize}
+%    \item $\mathit{arg}_i$: $i$th argument (\lstinline{Object})
+%    \item *: marker (singleton \lstinline{Object})
+%    \item $\mathit{key}_i$: $i$th key in Hash (\lstinline{String})
+%    \item $\mathit{value}_i$: $i$th value in Hash (\lstinline{Object})
+%\end{itemize}
+%\end{frame}
 
 \begin{frame}{Store Keyword Arguments in Array}
 \begin{itemize}
@@ -387,6 +385,7 @@ method & declarationFrame & self & block & countKwArgs  \\
 \end{itemize}
 \end{frame}
 
+\section{Limitations of Truffle}
 \begin{frame}{Recap: Type Decision Chains}
 \begin{table}
     \includegraphics[width=\textwidth]{type_chain.pdf}
@@ -451,10 +450,50 @@ end
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Almost Fully Optimized Keyword Arguments}
-Store HashMap mapping receiver type to arguments array in RubyCallNodes. Assumption invalidates arguments when method with that name changes. When threshold is reached, switch to old behavior. Kind of specialization built by ourselves.
+\begin{frame}[fragile]{Polymorphic Inline Caching in Truffle}
+\begin{itemize}
+    \item Supported by Truffle via type decision chains for types that are known at guest language implementation compile time
+    \item Not supported by Truffle for types defined in guest language
+    \item Example: Guest language PIC in JRuby
+\end{itemize}
+
+\begin{table}
+\begin{lstlisting}
+@TypeSystem({
+    boolean.class, 
+    byte.class, 
+    int.class, 
+    long.class, 
+    float.class, 
+    String.class,
+    RubyBignum.class, 
+    RubyArray.class, 
+    RubyHash.class,
+    RubyModule.class, ... }) 
+\end{lstlisting}
+\end{table}
 \end{frame}
 
+\begin{frame}{Guest Language PIC in JRuby}
+\begin{table}
+    \includegraphics[width=\textwidth]{dispatch.pdf}
+\end{table}
+\end{frame}
+
+\begin{explainframe}{Guest Language PIC in JRuby}
+\begin{itemize}
+    \item \lstinline{UnresolvedDispatchNode}: corresponds to Truffle's \emph{unspecified node}
+    \item \lstinline{UncachedDispatchNode}: corresponds to Truffle's \emph{generic node}
+    \item \lstinline{CachedDispatchNode}: corresponds to Truffle's \emph{specialized nodes}
+    \item Node rewriting similar to Truffle but without Truffle
+\end{itemize}
+\end{explainframe}
+
+\begin{frame}{Argument Passing in \lstinline{DispatchNode}}
+\begin{table}
+    \includegraphics[width=\textwidth]{dispatch_opt.pdf}
+\end{table}
+\end{frame}
 
 \section{Summary}
 %%%%%%%%%%%%%%%%%
