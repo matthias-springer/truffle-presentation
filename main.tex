@@ -235,11 +235,6 @@ end
 method(10, e: 30, c: 40)
 => [10, 1, 40, 2]
 \end{lstlisting}
-
-\begin{table}
-    \centering
-    \includegraphics[width=0.75\textwidth]{kwarg_1.pdf}
-\end{table}
 \end{frame}
 
 \begin{frame}[fragile]{Keyword Arguments in Ruby 2.x}
@@ -275,9 +270,13 @@ method(**{b: 3, a: 3}, **{a: 4})
 \end{frame}
 
 \begin{frame}{JRuby: Implementation of Keyword Arguments}
+%\begin{table}
+%    \centering
+%    \includegraphics[width=\textwidth]{method_args_array.pdf}
+%\end{table}
 \begin{table}
     \centering
-    \includegraphics[width=\textwidth]{method_args_array.pdf}
+    \includegraphics[width=0.75\textwidth]{kwarg_1.pdf}
 \end{table}
 
 \begin{itemize}
@@ -286,17 +285,8 @@ method(**{b: 3, a: 3}, **{a: 4})
 \end{itemize}
 \end{frame}
 
-\begin{frame}{JRuby Compilation Process}
-\begin{enumerate}
-    \item Ruby Source Code
-    \item JRuby AST
-    \item JRuby Truffle AST (with specializations, support for node rewriting)
-    \item Byte Code
-    \item Native Code 
-\end{enumerate}
-\end{frame}
-
 \section{Optimizing Keyword Access in JRuby}
+\subsection{Problem}
 \begin{frame}{JRuby: Understanding a method}
 \begin{enumerate}
  \item RubyRootNode
@@ -320,12 +310,37 @@ method(**{b: 3, a: 3}, **{a: 4})
 %\end{itemize}
 %\end{frame}
 
+\begin{frame}{Performance Bottlenecks}
+\begin{itemize}
+    \item \lstinline{Hash} object creation: object is created, passed as argument, then destructed again
+    \item Inefficient code paths (e.g., multiple scans of \lstinline{Hash} object)
+    \item Code involving \lstinline{Hash} objects is harder to optimize than code involving primitive objects (Graal optimizations)
+    \item Keyword argument nodes are not optimized by Truffle (Java \lstinline{equals}, Truffle boundary for \lstinline{Hash} iterator)
+\end{itemize}
 
+\begin{table}
+    \centering
+\textbf{Goal: pass keyword arguments like normal arguments}
+\end{table}
+\end{frame}
+
+
+\begin{frame}{JRuby Compilation Process}
+\begin{enumerate}
+    \item Ruby Source Code
+    \item JRuby AST
+    \item JRuby Truffle AST (with specializations, support for node rewriting)
+    \item Byte Code
+    \item Native Code
+\end{enumerate}
+\end{frame}
+
+\subsection{Solution}
 \begin{frame}{Store Keyword Arguments in Array}
 \begin{itemize}
-    \item Before: \lstinline{RubyCallNode.arguments} contains a Hash as last array element
+    \item Before: \lstinline{RubyCallNode.arguments} contains a \lstinline{Hash} as last array element
     \item Idea: add key-value pairs to array with marker object as hash separator
-    \item Benefit: no Hash creation
+    \item Benefit: no \lstinline{Hash} creation
 \end{itemize}
 \end{frame}
 
@@ -340,8 +355,8 @@ $\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\math
 \begin{itemize}
     \item $\mathit{arg}_i$: $i$th argument (\lstinline{RubyNode})
     \item *: marker (\lstinline{MarkerNode}, executes to singleton \lstinline{Object})
-    \item $\mathit{key}_i$: $i$th key in Hash (\lstinline{StringLiteralNode})
-    \item $\mathit{value}_i$: $i$th value in Hash (\lstinline{RubyNode})
+    \item $\mathit{key}_i$: $i$th key in \lstinline{Hash} (\lstinline{StringLiteralNode})
+    \item $\mathit{value}_i$: $i$th value in \lstinline{Hash} (\lstinline{RubyNode})
 \end{itemize}
 \end{frame}
 
@@ -379,9 +394,9 @@ $\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\math
 
 \begin{frame}{Store Keyword Arguments in Array}
 \begin{itemize}
-    \item Read keyword argument: if \lstinline{countKwArgs > 0}, scan expanded Hash. Else, extract value from Hash.
-    \item Read argument: if last argument is expanded Hash: \\ generate Hash object.
-    \item Read rest keyword arguments: generate Hash object for keywords that are not excluded.
+    \item Read keyword argument: scan expanded \lstinline{Hash} or extract value from \lstinline{Hash}.
+    \item Read argument: if last argument is expanded \lstinline{Hash}: \\ generate \lstinline{Hash} object.
+    \item Read rest keyword arguments: generate \lstinline{Hash} object for keywords that are not excluded.
 \end{itemize}
 \end{frame}
 
@@ -431,7 +446,7 @@ end
 
 \begin{itemize}
     \item Node specialization for every method (for every receiver type)
-    \item Specialized nodes do not construct Hash nodes only to read arguments from them
+    \item Specialized nodes do not construct \lstinline{Hash} nodes only to read arguments from them
 \end{itemize}
 \end{frame}
 
@@ -493,6 +508,10 @@ end
 \begin{table}
     \includegraphics[width=\textwidth]{dispatch_opt.pdf}
 \end{table}
+\end{frame}
+
+\begin{frame}{Evaluation}
+benchmarks and explain why it is faster
 \end{frame}
 
 \section{Summary}
