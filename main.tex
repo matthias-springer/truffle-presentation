@@ -2,9 +2,9 @@
 
 %\usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath} 
-\usepackage{graphicx} 
-\usepackage{subfigure} 
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfigure}
 \usepackage{multimedia}
 \usepackage{wrapfig}
 \usepackage{listings}
@@ -73,19 +73,19 @@
 % BEAMER-Anpassungen
 %%%%%%%%%%%%%%%%%%%%%%%%
 \setbeamercolor{block title}{bg=DarkOrange}
-\setbeamercolor{block body}{bg=Orange!20} 
+\setbeamercolor{block body}{bg=Orange!20}
 %\setbeamercolor{block title alerted}{bg=red}
-\setbeamercolor{block body alerted}{bg=red!20} 
+\setbeamercolor{block body alerted}{bg=red!20}
 %\setbeamercolor{block title example}{bg=green}
-\setbeamercolor{block body example}{bg=DarkChameleon!20} 
-%\usecolortheme[RGB={205,173,0}]{structure} 
+\setbeamercolor{block body example}{bg=DarkChameleon!20}
+%\usecolortheme[RGB={205,173,0}]{structure}
 \usecolortheme[RGB={30,74,135}]{structure}
 
 \usecolortheme{orchid}
 %\usefonttheme{professionalfonts}
 %\useoutertheme[subsection=false]{smoothbars}
 %\useinnertheme{rectangles}
-%\setbeamertemplate{blocks}[shadow=true] 
+%\setbeamertemplate{blocks}[shadow=true]
 
 \setbeamercovered{transparent}
 \setbeamertemplate{navigation symbols}{}%remove navigation symbols
@@ -191,17 +191,31 @@
 	\tableofcontents[hideallsubsections]
 \end{frame}
 
-\section{Truffle Demo}
+
+\section{Recap}
+%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
+
+\begin{frame}{Recap: What is Truffle/Graal?}
+\begin{itemize}
+    \item Truffle/Graal is like RPython a toolchain to build fast VMs easily
+    \item Truffle is a AST interpreter framework
+    \item Graal is controllable JVM - to optimize/compile specified code segment into machine code
+    \item Truffle supports easy node replacements for specific optimizations
+\end{itemize}
+\end{frame}
+
+
+\section{Truffle/Graal in Action}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Graal VM - System Architecture}
-
 \begin{table}
     \centering
     \includegraphics[width=0.75\textwidth]{graal_architecture.pdf}
 \end{table}
-
 \end{frame}
-
 
 \begin{explainframe}{Graal VM - Details}
 \begin{enumerate}
@@ -210,63 +224,56 @@
     \item Compiler threads compile methods with highest priorities
     \item Machine code is installed into runtime's cache
 \end{enumerate}
-
 \end{explainframe}
 
-\begin{frame}{Truffle in Action}
-[Small reminder on truffle / graal]
-example script (5 times; n.times integer stuff)]
+\begin{frame}[fragile]{Demo}
 
-performance results
+\begin{center}
+\huge{DEMO}
 
-warm up time!!
-
-live backtracing in eclipse on graal optimizations
-\end{frame}
-
-\section{Keyword Arguments}
-
-\begin{frame}[fragile]{Keyword Arguments in Ruby 2.x}
 \begin{lstlisting}
-def method(a, b = 1, c:, d: 2, **more)
-    [a, b, c, d]
+def multi(a, b)
+    a * b
 end
 
-method(10, e: 30, c: 40)
-=> [10, 1, 40, 2]
+1000.times do
+  sum = 0
+  1_000_000.times do |i|
+    sum += multi(i, 3)
+  end
+end
 \end{lstlisting}
+\end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Keyword Arguments in Ruby 2.x}
-\begin{lstlisting}
-def method(a = 1, b: 2)
-    [a, b]
-end
+\begin{frame}{Warm Up Time}
 
-method({b: 3})
-=> [1, 3]
-\end{lstlisting}
+% TODO messure warm up times!
+
+\begin{itemize}
+ \item Truffle/Graal ends with a very low execution time per iteration
+ \item Has large boot up time
+ \item First iterations are slow (in comparison)
+ \item $\rightarrow$ Only faster if there are a large number for iterations/long overall execution time
+\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Keyword Arguments in Ruby 2.x}
-\begin{lstlisting}[caption=test]
-def method(a = 1, b: 2)
-    [a, b]
-end
+\section{Challenge: Optimize Keyword Arguments in JRuby}
 
-method({x: 1})
-ArgumentError: unknown keyword: x
-\end{lstlisting}
+\begin{frame}[fragile]{Task: Keyword Arguments in Ruby 2.x}
 
-\begin{lstlisting}[caption=test]
-def method(a:, b: 2)
-    [a, b]
-end
-
-method(**{b: 3, a: 3}, **{a: 4})
-=> [3, 3]  # ruby 2.1
-=> [4, 3]  # ruby 2.2
-\end{lstlisting}
+\begin{itemize}
+ \item Shortcut to call method with dictionary as last argument:
+    \begin{lstlisting}
+    method(10, e: 30, c: 40)
+    method(10, {:e => 30, :c => 40})
+    \end{lstlisting}
+  \item Starting with Ruby 2.0 Ruby can process this dictionary automatically (keyword arguments):
+    \begin{lstlisting}
+    def method(a, b=3, e:, c:30)
+    end
+    \end{lstlisting}
+\end{itemize}
 \end{frame}
 
 \begin{frame}{JRuby: Implementation of Keyword Arguments}
@@ -282,12 +289,12 @@ method(**{b: 3, a: 3}, **{a: 4})
 \begin{itemize}
     \item Parser generates \lstinline{HashNode} for keyword argument
     \item Keyword arguments are stored in last argument in arguments array
+    \item Nice: every argument has a Node to create its default argument, maybe a Node that throws every time a exception
 \end{itemize}
 \end{frame}
 
-\section{Optimizing Keyword Access in JRuby}
 \subsection{Problem}
-\begin{frame}{JRuby: Understanding a method}
+\begin{frame}{How to design a AST for a method}
 \begin{enumerate}
  \item RubyRootNode
  \item Catch*Nodes (CatchNextNode, CatchRetryAsErrorNode, CatchReturnNode \dots)
@@ -325,7 +332,7 @@ method(**{b: 3, a: 3}, **{a: 4})
 \end{frame}
 
 
-\begin{frame}{JRuby Compilation Process}
+\begin{frame}{Using Truffle with an existing AST Interpreter}
 \begin{enumerate}
     \item Ruby Source Code
     \item JRuby AST
@@ -364,7 +371,7 @@ $\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\math
 %\begin{table}
 %\begin{tabular}{|c|c|c|c|c|}
 %\hline
-%method & declarationFrame & self & block & countKwArgs  \\ 
+%method & declarationFrame & self & block & countKwArgs  \\
 %\hline
 %\end{tabular}
 %\end{table}
@@ -475,16 +482,16 @@ end
 \begin{table}
 \begin{lstlisting}
 @TypeSystem({
-    boolean.class, 
-    byte.class, 
-    int.class, 
-    long.class, 
-    float.class, 
+    boolean.class,
+    byte.class,
+    int.class,
+    long.class,
+    float.class,
     String.class,
-    RubyBignum.class, 
-    RubyArray.class, 
+    RubyBignum.class,
+    RubyArray.class,
     RubyHash.class,
-    RubyModule.class, ... }) 
+    RubyModule.class, ... })
 \end{lstlisting}
 \end{table}
 \end{frame}
