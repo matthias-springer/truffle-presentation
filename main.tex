@@ -258,22 +258,16 @@ end
 \end{itemize}
 \end{frame}
 
-\section{Challenge: Optimize Keyword Arguments in JRuby}
+\section{How to use Truffle?}
 
-\begin{frame}[fragile]{Task: Keyword Arguments in Ruby 2.x}
-
-\begin{itemize}
- \item Shortcut to call method with dictionary as last argument:
-    \begin{lstlisting}
-    method(10, e: 30, c: 40)
-    method(10, {:e => 30, :c => 40})
-    \end{lstlisting}
-  \item Starting with Ruby 2.0 Ruby can process this dictionary automatically (keyword arguments):
-    \begin{lstlisting}
-    def method(a, b=3, e:, c:30)
-    end
-    \end{lstlisting}
-\end{itemize}
+\begin{frame}{Using Truffle with an existing AST Interpreter}
+\begin{enumerate}
+    \item Ruby Source Code
+    \item JRuby AST
+    \item JRuby Truffle AST (with specializations, support for node rewriting)
+    \item Byte Code
+    \item Native Code
+\end{enumerate}
 \end{frame}
 
 \begin{frame}{JRuby: Implementation of Keyword Arguments}
@@ -292,8 +286,6 @@ end
     \item Nice: every argument has a Node to create its default argument, maybe a Node that throws every time a exception
 \end{itemize}
 \end{frame}
-
-\subsection{Problem}
 \begin{frame}{How to design a AST for a method}
 \begin{enumerate}
  \item RubyRootNode
@@ -307,7 +299,26 @@ end
     \item statement sequence itself (wrapped in TracingNodes)
   \end{enumerate}
 \end{enumerate}
+\end{frame}
 
+
+
+\section{Challenge: Optimize Keyword Arguments in JRuby}
+
+\begin{frame}[fragile]{Task: Keyword Arguments in Ruby 2.x}
+
+\begin{itemize}
+ \item Shortcut to call method with dictionary as last argument:
+    \begin{lstlisting}
+    method(10, e: 30, c: 40)
+    method(10, {:e => 30, :c => 40})
+    \end{lstlisting}
+  \item Starting with Ruby 2.0 Ruby can process this dictionary automatically (keyword arguments):
+    \begin{lstlisting}
+    def method(a, b=3, e:, c:30)
+    end
+    \end{lstlisting}
+\end{itemize}
 \end{frame}
 
 %\begin{frame}{First Optimizations}
@@ -316,6 +327,8 @@ end
 % \item Using iterators to improve RubyHash handling
 %\end{itemize}
 %\end{frame}
+
+\subsection{Problem}
 
 \begin{frame}{Performance Bottlenecks}
 \begin{itemize}
@@ -331,16 +344,6 @@ end
 \end{table}
 \end{frame}
 
-
-\begin{frame}{Using Truffle with an existing AST Interpreter}
-\begin{enumerate}
-    \item Ruby Source Code
-    \item JRuby AST
-    \item JRuby Truffle AST (with specializations, support for node rewriting)
-    \item Byte Code
-    \item Native Code
-\end{enumerate}
-\end{frame}
 
 \subsection{Solution}
 \begin{frame}{Store Keyword Arguments in Array}
@@ -550,5 +553,4 @@ benchmarks and explain why it is faster
 \end{itemize}
 \end{description}
 \end{frame}
-
 \end{document}
