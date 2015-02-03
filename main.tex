@@ -210,23 +210,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Graal VM - System Architecture}
-\begin{table}
-    \centering
-    \includegraphics[width=0.75\textwidth]{graal_architecture.pdf}
-\end{table}
-\end{frame}
-
-\begin{explainframe}{Graal VM - Details}
-\begin{enumerate}
-    \item HotSpot VM detects \textit{hot} methods
-    \item HotSpot VM adds these methods to compilation queue
-    \item Compiler threads compile methods with highest priorities
-    \item Machine code is installed into runtime's cache
-\end{enumerate}
-\end{explainframe}
-
-
 \begin{frame}[fragile]{Demo}
 \begin{center}
 \huge{DEMO}
@@ -246,16 +229,39 @@ end
 \end{center}
 \end{frame}
 
+\begin{frame}{Example Runtimes}
+\begin{enumerate}
+ \item \textbf{MRI:} 175ms
+ \item \textbf{JRuby:} 80ms
+ \item \textbf{JRuby + Truffle:} 720ms
+ \item \textbf{JRuby + Graal:} 180ms
+ \item \textbf{JRuby + Truffle + Graal:} 1.5ms
+\end{enumerate}
 
-\begin{frame}{Warm Up Time}
+\begin{alertblock}{Warm-Up Time}
+Truffle/Graal ends with a very low execution time per iteration, but has large boot up time
 
-% TODO messure warm up times!
-
-\begin{itemize}
- \item Truffle/Graal ends with a very low execution time per iteration, Has large boot up time
- \item $\rightarrow$ Only faster if there are a large number for iterations/long overall execution time
-\end{itemize}
+$\rightarrow$ Only faster if there is a large number for iterations/long overall execution time
+\end{alertblock}
 \end{frame}
+
+\begin{frame}{Graal VM - System Architecture}
+\begin{table}
+    \centering
+    \includegraphics[width=0.75\textwidth]{graal_architecture.pdf}
+\end{table}
+\end{frame}
+
+\begin{explainframe}{Graal VM - Details}
+\begin{enumerate}
+    \item HotSpot VM detects \textit{hot} methods
+    \item HotSpot VM adds these methods to compilation queue
+    \item Compiler threads compile methods with highest priorities
+    \item Machine code is installed into runtime's cache
+\end{enumerate}
+\end{explainframe}
+
+
 
 \section{Truffle in Practice}
 
@@ -286,10 +292,11 @@ end
       \item list of argument AST nodes
       \item block AST node
       \end{itemize}
+    \item Dynamic call $\rightarrow$ dynamic dispatch is run on every execution
 \end{itemize}
 \end{frame}
 
-\begin{frame}{How to design an AST for a method}
+\begin{frame}{Method Callee Node in (J)Ruby}
 \begin{enumerate}
  \item RubyRootNode
  \item Catch*Nodes (CatchNextNode, CatchRetryAsErrorNode, CatchReturnNode \dots)
@@ -299,10 +306,9 @@ end
     \item WriteFactory for args 2
     \item WriteFactory for kw e
     \item WriteFactory for kw c
-    \item statement sequence itself (wrapped in TracingNodes)
+    \item statement sequence itself (wrapped in TracingNodes, with CyclingAssumptions)
   \end{enumerate}
 \end{enumerate}
-
 Nice: every argument has a Node to create its default argument, maybe a Node that throws every time a exception
 \end{frame}
 
@@ -415,7 +421,6 @@ $\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\math
 \end{itemize}
 \end{frame}
 
-\section{Limitations of Truffle}
 \begin{frame}{Recap: Type Decision Chains}
 \begin{table}
     \includegraphics[width=\textwidth]{type_chain.pdf}
@@ -548,7 +553,8 @@ benchmarks and explain why it is faster
 \begin{frame}{Truffle Summary}
 \begin{itemize}
  \item Specific java code cannot be translated by graal (or it is disallowed)
- \item large AST interpreter can still be get unclear/distracting
+ \item Large AST interpreter can still be get unclear/distracting (it is java $\rightarrow$ some code needed to get things done)
+ \item It is still needed to write efficient code / node implementations
 \end{itemize}
 \end{frame}
 
