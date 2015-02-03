@@ -200,8 +200,8 @@
 \begin{itemize}
     \item Truffle/Graal is like RPython a toolchain to build fast VMs easily
     \item Truffle is an AST interpreter framework
-    \item Graal is controllable JVM - to optimize/compile specified code segment into machine code
-    \item Truffle supports easy node replacements for specific optimizations
+    \item Graal is controllable JVM - to compile specified code segment into machine code and aggressively optimize
+    \item Truffle uses node replacements for specific optimizations (like type specific actions)
 \end{itemize}
 \end{frame}
 
@@ -226,8 +226,8 @@
 \end{enumerate}
 \end{explainframe}
 
-\begin{frame}[fragile]{Demo}
 
+\begin{frame}[fragile]{Demo}
 \begin{center}
 \huge{DEMO}
 
@@ -246,46 +246,49 @@ end
 \end{center}
 \end{frame}
 
+
 \begin{frame}{Warm Up Time}
 
 % TODO messure warm up times!
 
 \begin{itemize}
- \item Truffle/Graal ends with a very low execution time per iteration
- \item Has large boot up time
- \item First iterations are slow (in comparison)
+ \item Truffle/Graal ends with a very low execution time per iteration, Has large boot up time
  \item $\rightarrow$ Only faster if there are a large number for iterations/long overall execution time
 \end{itemize}
 \end{frame}
 
-\section{How to use Truffle?}
+\section{Truffle in Practice}
 
-\begin{frame}{Using Truffle with an existing AST Interpreter}
-%\begin{enumerate}
-%    \item Ruby Source Code
-%    \item JRuby AST
-%    \item JRuby Truffle AST (with specializations, support for node rewriting)
-%    \item Byte Code
-%    \item Native Code
-%\end{enumerate}
+\begin{frame}{Ways to use Truffle within an existing AST Interpreter}
+
+\begin{description}
+ \item[Convert to Truffle:] Port all AST Nodes to Truffle nodes
+ \item[Add-on Truffle:] Add an additional set of AST nodes:
+
+\begin{table}
+    \centering
+    \includegraphics[width=0.75\textwidth]{graaltruffle.pdf}
+\end{table}
+\end{description}
 \end{frame}
 
-\begin{frame}{JRuby: Implementation of Keyword Arguments}
-%\begin{table}
-%    \centering
-%    \includegraphics[width=\textwidth]{method_args_array.pdf}
-%\end{table}
+\begin{frame}{Method Call Nodes in (J)Ruby}
 \begin{table}
     \centering
     \includegraphics[width=0.75\textwidth]{kwarg_1.pdf}
 \end{table}
 
 \begin{itemize}
-    \item Parser generates \lstinline{HashNode} for keyword argument
-    \item Keyword arguments are stored in last argument in arguments array
-    \item Nice: every argument has a Node to create its default argument, maybe a Node that throws every time a exception
+    \item Call Node contains:
+      \begin{itemize}
+      \item receiver object
+      \item method name (fix)
+      \item list of argument AST nodes
+      \item block AST node
+      \end{itemize}
 \end{itemize}
 \end{frame}
+
 \begin{frame}{How to design an AST for a method}
 \begin{enumerate}
  \item RubyRootNode
@@ -299,6 +302,8 @@ end
     \item statement sequence itself (wrapped in TracingNodes)
   \end{enumerate}
 \end{enumerate}
+
+Nice: every argument has a Node to create its default argument, maybe a Node that throws every time a exception
 \end{frame}
 
 
@@ -539,6 +544,13 @@ benchmarks and explain why it is faster
 
 \section{Summary}
 %%%%%%%%%%%%%%%%%
+
+\begin{frame}{Truffle Summary}
+\begin{itemize}
+ \item Specific java code cannot be translated by graal (or it is disallowed)
+ \item large AST interpreter can still be get unclear/distracting
+\end{itemize}
+\end{frame}
 
 \begin{frame}{Truffle and RPython - a Very Subjective Comparison}
 \begin{description}
