@@ -357,68 +357,12 @@ Nice: every argument has a Node to create its default argument, maybe a Node tha
 
 
 \subsection{Solution}
-\begin{frame}{Store Keyword Arguments in Array}
-\begin{itemize}
-    \item Before: \lstinline{RubyCallNode.arguments} contains a \lstinline{Hash} as last array element
-    \item Idea: add key-value pairs to array with marker object as hash separator
-    \item Benefit: no \lstinline{Hash} creation
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Store Keyword Arguments in Array}{AST: \lstinline{RubyCallNode} arguments}
-\begin{table}
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-\hline
-$\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\mathit{value}_1$ & $\mathit{key}_2$ & $\mathit{value}_2$ & \ldots & * \\
-\hline
-\end{tabular}
-\end{table}
-\begin{itemize}
-    \item $\mathit{arg}_i$: $i$th argument (\lstinline{RubyNode})
-    \item *: marker (\lstinline{MarkerNode}, executes to singleton \lstinline{Object})
-    \item $\mathit{key}_i$: $i$th key in \lstinline{Hash} (\lstinline{StringLiteralNode})
-    \item $\mathit{value}_i$: $i$th value in \lstinline{Hash} (\lstinline{RubyNode})
-\end{itemize}
-\end{frame}
-
-%\begin{frame}{Store Keyword Arguments in Array}{Arguments (objects) in Method Execution}
-%\begin{table}
-%\begin{tabular}{|c|c|c|c|c|}
-%\hline
-%method & declarationFrame & self & block & countKwArgs  \\
-%\hline
-%\end{tabular}
-%\end{table}
-%\begin{table}
-%\begin{tabular}{|c|c|c|c|c|}
-%\hline
-% $\mathit{arg}_0$ & \ldots & $\mathit{arg}_{n-1}$ & *  & $\mathit{key}_1$\\
-%\hline
-%\end{tabular}
-%\end{table}
-
-%\begin{table}
-%\begin{tabular}{|c|c|c|c|c|}
-%\hline
-% $\mathit{value}_1$ & \ldots  & $\mathit{key}_m$ & $\mathit{value}_m$ & * \\
-%\hline
-%\end{tabular}
-%\end{table}
-%
-%\begin{itemize}
-%    \item $\mathit{arg}_i$: $i$th argument (\lstinline{Object})
-%    \item *: marker (singleton \lstinline{Object})
-%    \item $\mathit{key}_i$: $i$th key in Hash (\lstinline{String})
-%    \item $\mathit{value}_i$: $i$th value in Hash (\lstinline{Object})
-%\end{itemize}
-%\end{frame}
-
-\begin{frame}{Store Keyword Arguments in Array}
-\begin{itemize}
-    \item Read keyword argument: scan expanded \lstinline{Hash} or extract value from \lstinline{Hash}.
-    \item Read argument: if last argument is expanded \lstinline{Hash}: \\ generate \lstinline{Hash} object.
-    \item Read rest keyword arguments: generate \lstinline{Hash} object for keywords that are not excluded.
-\end{itemize}
+\begin{frame}{Optimizations}
+\begin{enumerate}
+ \item Optimize implementations (efficient hash opterations)
+ \item Store kwargs arguments within normal arguments array, separated by marker
+ \item Cache kwargs mapping within dispatch chain
+\end{enumerate}
 \end{frame}
 
 \begin{frame}{Recap: Type Decision Chains}
@@ -571,4 +515,33 @@ benchmarks and explain why it is faster
 \end{itemize}
 \end{description}
 \end{frame}
+
+
+\appendix
+\section{Keyword arguments within arguments array}
+
+\begin{frame}{Store Keyword Arguments in Array}{AST: \lstinline{RubyCallNode} arguments}
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+$\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\mathit{value}_1$ & $\mathit{key}_2$ & $\mathit{value}_2$ & \ldots & * \\
+\hline
+\end{tabular}
+\end{table}
+\begin{itemize}
+    \item $\mathit{arg}_i$: $i$th argument (\lstinline{RubyNode})
+    \item *: marker (\lstinline{MarkerNode}, executes to singleton \lstinline{Object})
+    \item $\mathit{key}_i$: $i$th key in \lstinline{Hash} (\lstinline{StringLiteralNode})
+    \item $\mathit{value}_i$: $i$th value in \lstinline{Hash} (\lstinline{RubyNode})
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Store Keyword Arguments in Array}
+\begin{itemize}
+    \item Read keyword argument: scan expanded \lstinline{Hash} or extract value from \lstinline{Hash}.
+    \item Read argument: if last argument is expanded \lstinline{Hash}: \\ generate \lstinline{Hash} object.
+    \item Read rest keyword arguments: generate \lstinline{Hash} object for keywords that are not excluded.
+\end{itemize}
+\end{frame}
+
 \end{document}
