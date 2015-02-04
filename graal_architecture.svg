@@ -14,7 +14,7 @@
    id="svg3669"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="graal_architecture.svg">
+   sodipodi:docname="graal_architecture.pdf">
   <defs
      id="defs3">
     <clipPath
@@ -37,7 +37,7 @@
      inkscape:zoom="2.8"
      inkscape:cx="111.55721"
      inkscape:cy="126.33787"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g3190"
      showgrid="false"
      inkscape:window-width="1449"
      inkscape:window-height="949"
@@ -81,19 +81,22 @@
                inkscape:connector-curvature="0" />
             <text
                id="text3196"
-               transform="matrix(1,0,0,-1,160.00977,88.973521)">
+               transform="scale(1,-1)"
+               x="172.91513"
+               y="-88.973518"
+               style="text-align:center;text-anchor:middle">
               <tspan
                  id="tspan3198"
                  sodipodi:role="line"
-                 y="0"
-                 x="0 5.7759423 10.223898 12.439876 17.767822 22.215778 26.663733 28.879711"
-                 style="font-size:7.99991989px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Arial;-inkscape-font-specification:Arial">HotSpot</tspan>
+                 x="172.91513"
+                 style="font-size:7.99991989px;font-variant:normal;font-weight:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+                 y="-88.973518">Graal</tspan>
               <tspan
                  id="tspan3200"
                  sodipodi:role="line"
-                 y="9.6000004"
-                 x="8.4500036 13.77795"
-                 style="font-size:7.99991989px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Arial;-inkscape-font-specification:Arial">VM</tspan>
+                 y="-79.37352"
+                 x="171.65977 176.98773"
+                 style="font-size:7.99991989px;font-variant:normal;font-weight:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:Arial;-inkscape-font-specification:Arial">VM</tspan>
             </text>
             <path
                id="path3202"
