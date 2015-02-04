@@ -116,13 +116,13 @@
 \setbeamertemplate{footline}{%
 	\leavevmode%
 	\hbox{%
-		\begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+		\begin{beamercolorbox}[wd=.45\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
 			\usebeamerfont{author in head/foot}\insertinstitute
 		\end{beamercolorbox}%
-		\begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+		\begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
 			\usebeamerfont{title in head/foot}\insertshorttitle
 		\end{beamercolorbox}%
-		\begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+		\begin{beamercolorbox}[wd=.35\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
 			\usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
 			\insertframenumber{}\ifthenelse{\boolean{isexplainframe}}{E}{} / \inserttotalframenumber\hspace*{2ex}
 	\end{beamercolorbox}}%
@@ -174,7 +174,7 @@
 
 % Dokument-Meta-Daten:
 %%%%%%%%%%%%%%%%%%%%%%%
-\title{Truffle -- Limitations and its Application in JRuby}
+\title{Exploring JRuby, Truffle and Graal}
 \subtitle{Virtual Machines and Execution Environments, WS2014/15}
 \author{Jan Graichen, Fabio Niephaus, Matthias Springer, Malte Swart}
 \date{\today}
@@ -196,40 +196,50 @@
 %%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%
 
-\begin{frame}{Recap: What is Truffle/Graal?}
+\begin{frame}{Recap: What is Truffle \& Graal?}
 \begin{itemize}
-    \item Truffle/Graal is like RPython a toolchain to build fast VMs easily
+    \item Truffle \& Graal is a toolchain to build fast VMs easily
+    \begin{itemize}
+      \item Similar to RPython
+    \end{itemize}
     \item Truffle is an AST interpreter framework
-    \item Graal is controllable JVM - to compile specified code segment into machine code and aggressively optimize
+    \item Graal is modified JVM
+    \begin{itemize}
+      \item Comes with an aggressive JIT compiler written in Java
+      \item Profiles code and detects hot methods
+      \item Truffle can use these information for making assumptions
+      \item Compiles specified code segment into machine code
+    \end{itemize}
     \item Truffle uses node replacements for specific optimizations (like type specific actions)
 \end{itemize}
 \end{frame}
 
 
-\section{Truffle/Graal in Action}
+\section{Truffle \& Graal in Action}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[fragile]{Demo}
 \begin{center}
-\huge{DEMO}
 
 \begin{lstlisting}
-def multi(a, b)
-    a * b
+def multiply(a, b)
+  a * b
 end
 
-1000.times do
-  sum = 0
-  1_000_000.times do |i|
-    sum += multi(i, 3)
-  end
+100_000.times.each do |times|
+    start = Time.now
+    (1..1_000_000).each do |i|
+        multiply(1, 2)
+    end
+    end_time = Time.now
+    puts "Time elapsed #{(end_time - start)*1000} ms"
 end
 \end{lstlisting}
 \end{center}
 \end{frame}
 
-\begin{frame}{Example Runtimes}
+\begin{frame}{Example Runtimes}{Empirical Figures}
 \begin{enumerate}
  \item \textbf{MRI:} 175ms
  \item \textbf{JRuby:} 80ms
@@ -239,9 +249,9 @@ end
 \end{enumerate}
 
 \begin{alertblock}{Warm-Up Time}
-Truffle/Graal ends with a very low execution time per iteration, but has large boot up time
+Truffle \& Graal ends with a very low execution time per iteration, but has large boot up time
 
-$\rightarrow$ Only faster if there is a large number for iterations/long overall execution time
+$\rightarrow$ Only faster if there is a large number of iterations/long overall execution time
 \end{alertblock}
 \end{frame}
 
@@ -254,8 +264,8 @@ $\rightarrow$ Only faster if there is a large number for iterations/long overall
 
 \begin{explainframe}{Graal VM - Details}
 \begin{enumerate}
-    \item HotSpot VM detects \textit{hot} methods
-    \item HotSpot VM adds these methods to compilation queue
+    \item Graal VM detects \textit{hot} methods
+    \item Graal VM adds these methods to compilation queue
     \item Compiler threads compile methods with highest priorities
     \item Machine code is installed into runtime's cache
 \end{enumerate}
@@ -270,12 +280,11 @@ $\rightarrow$ Only faster if there is a large number for iterations/long overall
 \begin{description}
  \item[Convert to Truffle:] Port all AST Nodes to Truffle nodes
  \item[Add-on Truffle:] Add an additional set of AST nodes:
-
-\begin{table}
-    \centering
-    \includegraphics[width=0.75\textwidth]{graaltruffle.pdf}
-\end{table}
 \end{description}
+\begin{table}
+  \centering
+  \includegraphics[width=1.0\textwidth]{graaltruffle.pdf}
+\end{table}
 \end{frame}
 
 \begin{frame}{Method Call Nodes in (J)Ruby}
