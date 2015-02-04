@@ -294,12 +294,12 @@ $\rightarrow$ Only faster if there is a large number of iterations/long overall 
 \end{table}
 
 \begin{itemize}
-    \item Call Node contains:
+    \item \lstinline{RubyCallNode} contains:
       \begin{itemize}
-      \item receiver object
-      \item method name (fix)
-      \item list of argument AST nodes
-      \item block AST node
+      \item Receiver object
+      \item Method name (fix)
+      \item List of argument AST nodes
+      \item Block AST node
       \end{itemize}
     \item Dynamic call $\rightarrow$ dynamic dispatch is run on every execution
 \end{itemize}
@@ -307,18 +307,18 @@ $\rightarrow$ Only faster if there is a large number of iterations/long overall 
 
 \begin{frame}{Method Callee Node in (J)Ruby}
 \begin{enumerate}
- \item RubyRootNode
- \item Catch*Nodes (CatchNextNode, CatchRetryAsErrorNode, CatchReturnNode \dots)
- \item SequenceNode \begin{enumerate}
-    \item CheckArityNode
-    \item WriteFactory for args 1
-    \item WriteFactory for args 2
-    \item WriteFactory for kw e
-    \item WriteFactory for kw c
-    \item statement sequence itself (wrapped in TracingNodes, with CyclingAssumptions)
+ \item \lstinline{RubyRootNode}
+ \item \lstinline{Catch*Nodes} (\lstinline{CatchNextNode}, \lstinline{CatchRetryAsErrorNode}, \lstinline{CatchReturnNode} \dots)
+ \item \lstinline{SequenceNode} \begin{enumerate}
+    \item \lstinline{CheckArityNode}
+    \item \lstinline{WriteFactory} for args 1
+    \item \lstinline{WriteFactory} for args 2
+    \item \lstinline{WriteFactory} for kw e
+    \item \lstinline{WriteFactory} for kw c
+    \item Statement sequence itself (wrapped in \lstinline{TracingNodes}, with \lstinline{CyclingAssumption}s)
   \end{enumerate}
 \end{enumerate}
-Nice: every argument has a Node to create its default argument, maybe a Node that throws every time a exception
+Nice: Every argument has a node to create its default argument, maybe a node that throws every time a exception
 \end{frame}
 
 
@@ -333,7 +333,7 @@ Nice: every argument has a Node to create its default argument, maybe a Node tha
     method(10, e: 30, c: 40)
     method(10, {:e => 30, :c => 40})
     \end{lstlisting}
-  \item Starting with Ruby 2.0 Ruby can process this dictionary automatically (keyword arguments):
+  \item Starting with Ruby 2.0, Ruby can process this dictionary automatically (so called keyword arguments):
     \begin{lstlisting}
     def method(a, b=3, e:, c:30)
     end
@@ -360,7 +360,7 @@ Nice: every argument has a Node to create its default argument, maybe a Node tha
 
 \begin{table}
     \centering
-\textbf{Goal: pass keyword arguments like normal arguments}
+\textbf{Goal: Pass keyword arguments as normal arguments}
 \end{table}
 \end{frame}
 
@@ -369,7 +369,7 @@ Nice: every argument has a Node to create its default argument, maybe a Node tha
 \begin{frame}{Optimizations}
 \begin{enumerate}
  \item Optimize implementations (efficient hash opterations)
- \item Store kwargs arguments within normal arguments array, separated by marker
+ \item Store kwargs within normal arguments array, separated by marker
  \item Cache kwargs mapping within dispatch chain
 \end{enumerate}
 \end{frame}
@@ -383,8 +383,8 @@ Nice: every argument has a Node to create its default argument, maybe a Node tha
 \begin{frame}{Fully Optimized Keyword Arguments}
 \begin{itemize}
     \item Before: \lstinline{RubyCallNode.arguments} contains keys and values of keyword arguments
-    \item Idea: call node is method-specific and stores values only (no keys!) for arguments specified in signature
-    \item Benefit: no linear scan of keyword argument array section
+    \item Idea: Call node is method-specific and stores values only (no keys!) for arguments specified in signature
+    \item Benefit: No linear scan of keyword argument array section
 \end{itemize}
 \end{frame}
 
@@ -505,22 +505,22 @@ benchmarks and explain why it is faster
 
 \begin{frame}{Truffle Summary}
 \begin{itemize}
- \item Specific java code cannot be translated by graal (or it is disallowed)
- \item Large AST interpreter can still be get unclear/distracting (it is java $\rightarrow$ some code needed to get things done)
- \item It is still needed to write efficient code / node implementations
+ \item Specific Java code cannot be translated by Graal (or it is disallowed)
+ \item Large AST interpreters can still get unclear/distracting (it is Java $\rightarrow$ some code needed to get things done)
+ \item It is still needed to write efficient code and node implementations
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Truffle and RPython - a Very Subjective Comparison}
+\begin{frame}{Truffle and RPython - A Very Subjective Comparison}
 \begin{description}
  \item[RPython] \begin{itemize}
-  \item lightwight stack
-  \item a little bit easier to get to work - mostly getting the correct libs in the python path
-  \item difficult to debug in depth what is happening at execution
+  \item Lightweight stack
+  \item A little bit easier to get to work - mostly getting the correct libs in the Python path
+  \item Difficult to debug in depth what is happening at execution
 \end{itemize}
 \item[Truffle] \begin{itemize}
-  \item heavy stack (java, mostly multiple JDK and often maven \dots)
-  \item if you get it working, you have the full power of (debugging) java, even graal itself
+  \item Heavy stack (Java, mostly multiple JDK and often maven \dots)
+  \item If you get it working, you have the full power of (debugging) Java, even Graal itself
 \end{itemize}
 \end{description}
 \end{frame}
