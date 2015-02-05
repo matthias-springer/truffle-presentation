@@ -151,9 +151,11 @@
 % Gliederung vor jedem Punkt:
 \AtBeginSection[]{
 \ifthenelse{\equal{\value{section}}{1}}{}{
+\ifthenelse{\equal{\value{section}}{6}}{}{
 \begin{frame}{Overview}
 	\tableofcontents[currentsection, hideothersubsections]
 \end{frame}
+}
 }
 }
 
@@ -393,12 +395,6 @@ $\rightarrow$ We will now look into optimization \#3
 \end{itemize}
 \end{explainframe}
 
-\begin{frame}{Recap: Type Decision Chains}{Source: ``Self-Optimizing AST Interpreters''}
-\begin{table}
-    \includegraphics[width=\textwidth]{type_chain.pdf}
-\end{table}
-\end{frame}
-
 \begin{frame}[fragile]{Fully Optimized Keyword Arguments}{Example}
 \begin{lstlisting}
 class Cls1
@@ -415,6 +411,12 @@ end
    obj.method(a: 1, b: 2)
 end
 \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Recap: Type Decision Chains}{Source: ``Self-Optimizing AST Interpreters''}
+\begin{table}
+    \includegraphics[width=\textwidth]{type_chain.pdf}
+\end{table}
 \end{frame}
 
 \begin{frame}{Fully Optimized Keyword Arguments}{Problems}
