@@ -151,9 +151,11 @@
 % Gliederung vor jedem Punkt:
 \AtBeginSection[]{
 \ifthenelse{\equal{\value{section}}{1}}{}{
+\ifthenelse{\equal{\value{section}}{6}}{}{
 \begin{frame}{Overview}
 	\tableofcontents[currentsection, hideothersubsections]
 \end{frame}
+}
 }
 }
 
