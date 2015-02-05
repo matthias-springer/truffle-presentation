@@ -284,7 +284,7 @@ $\rightarrow$ Only faster if there is a large number of iterations/long overall 
 
 \begin{description}
  \item[Convert to Truffle:] Translate all AST nodes to Truffle nodes
- \item[Add-On Truffle:] Add an additional set of AST nodes:
+ \item[Add-On Truffle:] Add an additional set of AST nodes
 \end{description}
 \begin{table}
   \centering
@@ -393,7 +393,7 @@ $\rightarrow$ We will now look into optimization \#3
 \end{itemize}
 \end{explainframe}
 
-\begin{frame}{Recap: Type Decision Chains}
+\begin{frame}{Recap: Type Decision Chains}{Source: ``Self-Optimizing AST Interpreters''}
 \begin{table}
     \includegraphics[width=\textwidth]{type_chain.pdf}
 \end{table}
@@ -454,7 +454,6 @@ end
 \end{itemize}
 \end{explainframe}
 
-
 \begin{frame}{Evaluation}
 \begin{exampleblock}{Results}
 Keyword arguments are as fast as position arguments
@@ -508,6 +507,7 @@ $\rightarrow$ Keyword arguments are as fast as position arguments
 \begin{itemize}
  \item L. Stadler, G. Duboscq, H. Mössenböck, T. Wurthinger, \textbf{Compilation Queuing and Graph Caching for Dynamic Compilers}, \small{\url{http://lafo.ssw.uni-linz.ac.at/papers/2012_VMIL_Graal.pdf}}
  \item T. Würthinger, C. Wimmer, A. Wöß, L. Stadler, G. Duboscq, C. Humer, G. Richards, D. Simon, M. Wolczko. \textbf{One VM to Rule Them All}, 2013, \small{\url{http://lafo.ssw.uni-linz.ac.at/papers/2013_Onward_OneVMToRuleThemAll.pdf}}
+ \item T. Würthinger, A. Woß, L. Stadler, G. Duboscq, D. Simon, C. Wimmer. \textbf{Self-Optimizing AST Interpreters}, 2012, \small{\url{http://lafo.ssw.uni-linz.ac.at/papers/2012_DLS_SelfOptimizingASTInterpreters.pdf}}
  \item Graal (\url{http://hg.openjdk.java.net/graal/graal})
  \item JRuby (\url{https://github.com/jruby/jruby})
  \item JRuby Developers (especially Chris Seaton)
