@@ -316,10 +316,10 @@ $\rightarrow$ Only faster if there is a large number of iterations/long overall 
  \item \lstinline{Catch*Nodes} (\lstinline{CatchNextNode}, \lstinline{CatchRetryAsErrorNode}, \lstinline{CatchReturnNode} \dots)
  \item \lstinline{SequenceNode} \begin{enumerate}
     \item \lstinline{CheckArityNode}
-    \item \lstinline{WriteFactory} for args 1
-    \item \lstinline{WriteFactory} for args 2
-    \item \lstinline{WriteFactory} for kw e
-    \item \lstinline{WriteFactory} for kw c
+    \item \lstinline{WriteLocalVariableNode} for argument 1
+    \item \lstinline{WriteLocalVariableNode} for argument 2
+    \item \lstinline{WriteLocalVariableNode} for kwargument e
+    \item \lstinline{WriteLocalVariableNode} for kwargument c
     \item Statement sequence itself (wrapped in \lstinline{TracingNodes}, with \lstinline{CyclicAssumption}s)
   \end{enumerate}
 \end{enumerate}
@@ -361,6 +361,7 @@ Nice: Every argument has a node to create its default argument, maybe a node tha
     \item Inefficient code paths (e.g., multiple scans of \lstinline{Hash} object)
     \item Code involving \lstinline{Hash} objects is harder to optimize than code involving primitive objects (Graal optimizations)
     \item Keyword argument nodes are not optimized by Truffle (Java \lstinline{equals}, Truffle boundary for \lstinline{Hash} iterator)
+    \item Execution remains in interpreter modus
 \end{itemize}
 
 \begin{table}
@@ -385,86 +386,30 @@ Nice: Every argument has a node to create its default argument, maybe a node tha
 \end{table}
 \end{frame}
 
-\begin{frame}{Fully Optimized Keyword Arguments}
-\begin{itemize}
-    \item Before: \lstinline{RubyCallNode.arguments} contains keys and values of keyword arguments
-    \item Idea: Call node is method-specific and stores values only (no keys!) for arguments specified in signature
-    \item Benefit: No linear scan of keyword argument array section
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Fully Optimized Keyword Arguments (Example)}
+\begin{frame}[fragile]{Fully Optimized Keyword Arguments}{Example}
 \begin{lstlisting}
 class Cls1
     def method(a:, **kwargs)
     end
 end
 
-def Cls2
+class Cls2
     def method(a:, b:)
     end
 end
 
-def getObject
-    # first call returns "Cls1.new"
-    # second call returns "Cls2.new"
-end
-
-2.times do
-    getObject().method(a: 1, b: 2)
+[Cls1.new, Cls2.new].each do |obj|
+   obj.method(a: 1, b: 2)
 end
 \end{lstlisting}
-\end{frame}
-
-\begin{frame}{Fully Optimized Keyword Arguments (Example)}{Type Decision Chain}
-\begin{table}
-    \centering
-    \includegraphics[width=\textwidth]{fully_opt.pdf}
-\end{table}
-
-\begin{itemize}
-    \item Node specialization for every method (for every receiver type)
-    \item Specialized nodes do not construct \lstinline{Hash} nodes only to read arguments from them
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Fully Optimized Keyword Arguments (Example)}{Generic Case}
-\begin{table}
-    \centering
-    \includegraphics[width=\textwidth]{kwargs_generic.pdf}
-\end{table}
 \end{frame}
 
 \begin{frame}{Fully Optimized Keyword Arguments}{Problems}
 \begin{itemize}
     \item Nodes are specific with regard to user-defined Ruby classes \\ (cannot use Truffle DSL)
-    \item Specializations are defined in Java code \\ (need to generate Java classes on the fly)
+    \item Truffle DSL supports only specialization for language types
     \item Type of receiver is not known before dispatching the call
 \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Polymorphic Inline Caching in Truffle}
-\begin{itemize}
-    \item Supported by Truffle via type decision chains for types that are known at guest language implementation compile time
-    \item Not supported by Truffle for types defined in guest language
-    \item Example: Guest language PIC in JRuby
-\end{itemize}
-
-\begin{table}
-\begin{lstlisting}
-@TypeSystem({
-    boolean.class,
-    byte.class,
-    int.class,
-    long.class,
-    float.class,
-    String.class,
-    RubyBignum.class,
-    RubyArray.class,
-    RubyHash.class,
-    RubyModule.class, ... })
-\end{lstlisting}
-\end{table}
 \end{frame}
 
 \begin{frame}{Guest Language PIC in JRuby}
@@ -496,14 +441,26 @@ end
 \end{itemize}
 \end{explainframe}
 
-\begin{frame}{Evaluation}
-benchmarks and explain why it is faster
 
+\begin{frame}{Evaluation}
+
+\begin{exampleblock}{Results}
+Keyword arguments get as fast as position arguments
+
+(for specific but common cases)
+\end{exampleblock}
+\end{frame}
+
+
+\begin{explainframe}{Evaluation}
+
+$\rightarrow$ Keyword arguments get as fast as position arguments
 \begin{itemize}
     \item Optimization affects only arguments passed in keyword argument syntax in method calls
     \item Optimization does not affect keyword arguments passed as an already existing \lstinline{Hash}
 \end{itemize}
-\end{frame}
+\end{explainframe}
+
 
 \section{Summary}
 %%%%%%%%%%%%%%%%%
@@ -511,7 +468,8 @@ benchmarks and explain why it is faster
 \begin{frame}{Truffle Summary}
 \begin{itemize}
  \item Specific Java code cannot be translated by Graal (or it is disallowed)
- \item Large AST interpreters can still get unclear/distracting (it is Java $\rightarrow$ some code needed to get things done)
+ \item Large AST interpreters can still get unclear/distracting, knowledge is the composition of nodes, not the nodes itself
+ \item Truffle DSL is not enough for efficient implementation of complex languages
  \item It is still needed to write efficient code and node implementations
 \end{itemize}
 \end{frame}
@@ -531,30 +489,17 @@ benchmarks and explain why it is faster
 \end{frame}
 
 
-\appendix
-\section{Keyword arguments within arguments array}
+\section{References}
+%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Store Keyword Arguments in Array}{AST: \lstinline{RubyCallNode} arguments}
-\begin{table}
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-\hline
-$\mathit{arg}_1$ & \ldots & $\mathit{arg}_{n-1}$ & * & $\mathit{key}_1$ & $\mathit{value}_1$ & $\mathit{key}_2$ & $\mathit{value}_2$ & \ldots & * \\
-\hline
-\end{tabular}
-\end{table}
+\begin{frame}{References}
 \begin{itemize}
-    \item $\mathit{arg}_i$: $i$th argument (\lstinline{RubyNode})
-    \item *: marker (\lstinline{MarkerNode}, executes to singleton \lstinline{Object})
-    \item $\mathit{key}_i$: $i$th key in \lstinline{Hash} (\lstinline{StringLiteralNode})
-    \item $\mathit{value}_i$: $i$th value in \lstinline{Hash} (\lstinline{RubyNode})
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Store Keyword Arguments in Array}
-\begin{itemize}
-    \item Read keyword argument: scan expanded \lstinline{Hash} or extract value from \lstinline{Hash}.
-    \item Read argument: if last argument is expanded \lstinline{Hash}: \\ generate \lstinline{Hash} object.
-    \item Read rest keyword arguments: generate \lstinline{Hash} object for keywords that are not excluded.
+ \item Lukas Stadler Gilles Duboscq
+Hanspeter Mössenböck, Thomas Wurthinger, \textbf{Compilation Queuing and Graph Caching for Dynamic Compilers}, \url{http://lafo.ssw.uni-linz.ac.at/papers/2012_VMIL_Graal.pdf}
+ \item Graal (\url{http://hg.openjdk.java.net/graal/graal})
+ \item JRuby (\url{https://github.com/jruby/jruby})
+ \item JRuby Developer (especially Chris Seaton)
+ \item JRuby benchmarks (\url{https://github.com/jruby/bench9000})
 \end{itemize}
 \end{frame}
 
