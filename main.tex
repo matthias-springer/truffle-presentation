@@ -283,8 +283,8 @@ $\rightarrow$ Only faster if there is a large number of iterations/long overall 
 \begin{frame}{Ways to use Truffle within an existing AST Interpreter}
 
 \begin{description}
- \item[Convert to Truffle:] Port all AST Nodes to Truffle nodes
- \item[Add-on Truffle:] Add an additional set of AST nodes:
+ \item[Convert to Truffle:] Translate all AST nodes to Truffle nodes
+ \item[Add-On Truffle:] Add an additional set of AST nodes:
 \end{description}
 \begin{table}
   \centering
@@ -306,7 +306,7 @@ $\rightarrow$ Only faster if there is a large number of iterations/long overall 
       \item List of argument AST nodes
       \item Block AST node
       \end{itemize}
-    \item Dynamic call $\rightarrow$ dynamic dispatch is run on every execution
+    \item Dynamic call $\rightarrow$ Dynamic dispatch is run on every execution
 \end{itemize}
 \end{frame}
 
@@ -379,7 +379,7 @@ Nice: Every argument has a node to create its default argument, maybe a node tha
  \item Cache kwargs mapping within dispatch chain
 \end{enumerate}
 
-$\rightarrow$ We will look into way three
+$\rightarrow$ We will now look into optimization \#3
 \end{frame}
 
 \begin{explainframe}{Fully Optimized Keyword Arguments}{Callee's Point of View}
@@ -440,7 +440,7 @@ end
 \end{itemize}
 \end{explainframe}
 
-\begin{frame}{Argument Passing in \lstinline{DispatchNode}}
+\begin{frame}{Argument Passing in \textit{DispatchNode}}
 \begin{table}
     \includegraphics[width=\textwidth]{dispatch_opt.pdf}
 \end{table}
@@ -506,12 +506,11 @@ $\rightarrow$ Keyword arguments are as fast as position arguments
 
 \begin{frame}{References}
 \begin{itemize}
- \item Lukas Stadler Gilles Duboscq
-Hanspeter Mössenböck, Thomas Wurthinger, \textbf{Compilation Queuing and Graph Caching for Dynamic Compilers}, \url{http://lafo.ssw.uni-linz.ac.at/papers/2012_VMIL_Graal.pdf}
+ \item L. Stadler, G. Duboscq, H. Mössenböck, T. Wurthinger, \textbf{Compilation Queuing and Graph Caching for Dynamic Compilers}, \small{\url{http://lafo.ssw.uni-linz.ac.at/papers/2012_VMIL_Graal.pdf}}
  \item Graal (\url{http://hg.openjdk.java.net/graal/graal})
  \item JRuby (\url{https://github.com/jruby/jruby})
- \item JRuby Developer (especially Chris Seaton)
- \item JRuby benchmarks (\url{https://github.com/jruby/bench9000})
+ \item JRuby Developers (especially Chris Seaton)
+ \item JRuby Benchmarks (\url{https://github.com/jruby/bench9000})
 \end{itemize}
 \end{frame}
 
